@@ -1,4 +1,4 @@
-package check
+package token
 
 import (
 	"log/slog"

@@ -7,9 +7,17 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 func init() {
+
+	err := godotenv.Load()
+	if err != nil {
+		slog.Error("error loading .env file", "error", err)
+	}
+
 	const LevelNone = slog.Level(1000)
 
 	options := &slog.HandlerOptions{

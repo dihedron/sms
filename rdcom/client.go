@@ -11,6 +11,8 @@ type Client struct {
 	api      *resty.Client
 	username string
 	password string
+	account  string
+	token    string
 	Token    *Token
 }
 
@@ -47,5 +49,17 @@ func (c *Client) Close() error {
 func (c *Client) SetUserCredentials(username string, password string) *Client {
 	c.username = username
 	c.password = password
+	return c
+}
+
+// SetAccount sets the account for the user.
+func (c *Client) SetAccount(account string) *Client {
+	c.account = account
+	return c
+}
+
+// SetAuthToken sets the authentication token for the user.
+func (c *Client) SetAuthToken(token string) *Client {
+	c.token = token
 	return c
 }

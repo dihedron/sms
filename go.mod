@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/jessevdk/go-flags v1.6.1
+	github.com/joho/godotenv v1.5.1
 	resty.dev/v3 v3.0.0-beta.1
 )
 
