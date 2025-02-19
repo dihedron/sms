@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+dist/
 
 # Test binary, built with `go test -c`
 *.test
@@ -17,9 +18,14 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# Local testing directory
+_tests/
+output/
+
 # Go workspace file
 go.work
 go.work.sum
 
 # env file
 .env
+.piped
