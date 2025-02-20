@@ -17,9 +17,9 @@ type Command struct {
 	// EnableTrace sets whether to enable trace info in API calls.
 	EnableTrace bool `short:"T" long:"enable-trace" description:"Whether to enable trace info in API calls." optional:"yes" hidden:"true" env:"SMS_ENABLE_TRACE"`
 	// CPUProfile sets the (optional) path of the file for CPU profiling info.
-	CPUProfile *string `short:"C" long:"cpu-profile" description:"The (optional) path where the CPU profiler will store its data." optional:"yes"`
+	CPUProfile *string `short:"C" long:"cpu-profile" description:"The (optional) path where the CPU profiler will store its data." optional:"yes" env:"SMS_CPU_PROFILE"`
 	// MemProfile sets the (optional) path of the file for memory profiling info.
-	MemProfile *string `short:"M" long:"mem-profile" description:"The (optional) path where the memory profiler will store its data." optional:"yes"`
+	MemProfile *string `short:"M" long:"mem-profile" description:"The (optional) path where the memory profiler will store its data." optional:"yes" env:"SMS_MEM_PROFILE"`
 }
 
 type TokenCommand struct {
