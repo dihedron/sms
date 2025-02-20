@@ -21,7 +21,24 @@ type Ping struct {
 func (cmd *Ping) Execute(args []string) error {
 	slog.Debug("called ping command", "token", cmd.Token, "endpoint", cmd.Endpoint, "account", cmd.Account)
 
-	client := rdcom.New(cmd.Endpoint, true).SetAuthToken(cmd.Token)
+	options := []rdcom.Option{
+		rdcom.WithBaseURL(cmd.Endpoint),
+	}
+	if cmd.SkipVerifyTLS {
+		options = append(options, rdcom.WithSkipTLSVerify(true))
+	}
+	if cmd.EnableDebug {
+		options = append(options, rdcom.WithDebug())
+	}
+	if cmd.EnableTrace {
+		options = append(options, rdcom.WithTrace())
+	}
+	if cmd.Token != "" {
+		options = append(options, rdcom.WithAuthToken(cmd.Token))
+	}
+
+	client := rdcom.New(options...)
+
 	defer client.Close()
 
 	if _, err := client.Token.List(); err != nil {

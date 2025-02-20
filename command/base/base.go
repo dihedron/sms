@@ -8,6 +8,12 @@ import (
 )
 
 type Command struct {
+	// SkipVerifyTLS sets whether to skip TLS verification.
+	SkipVerifyTLS bool `short:"S" long:"skip-verify-tls" description:"Whether to skip TLS verification." optional:"yes" hidden:"yes" env:"SMS_SKIP_TLS_VERIFY"`
+	// EnableDebug sets whether to enable debug info in API calls.
+	EnableDebug bool `short:"D" long:"enable-debug" description:"Whether to enable debug info in API calls." optional:"yes" hidden:"true" env:"SMS_ENABLE_DEBUG"`
+	// EnableTrace sets whether to enable trace info in API calls.
+	EnableTrace bool `short:"T" long:"enable-trace" description:"Whether to enable trace info in API calls." optional:"yes" hidden:"true" env:"SMS_ENABLE_TRACE"`
 	// CPUProfile sets the (optional) path of the file for CPU profiling info.
 	CPUProfile *string `short:"C" long:"cpu-profile" description:"The (optional) path where the CPU profiler will store its data." optional:"yes"`
 	// MemProfile sets the (optional) path of the file for memory profiling info.
