@@ -19,7 +19,7 @@ type Check struct {
 func (cmd *Check) Execute(args []string) error {
 	slog.Debug("called check command")
 
-	client := rdcom.New(cmd.Endpoint, true).SetUserCredentials(cmd.Username, cmd.Password)
+	client := rdcom.New(rdcom.WithBaseURL(cmd.Endpoint), rdcom.WithSkipTLSVerify(true), rdcom.WithUserCredentials(cmd.Username, cmd.Password))
 	defer client.Close()
 
 	if err := client.Token.Create(); err != nil {

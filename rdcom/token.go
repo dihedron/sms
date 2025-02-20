@@ -54,12 +54,11 @@ func (t *Token) List() ([]string, error) {
 	}
 
 	result := &ListResponse{}
-
-	response, err := t.Service.backref.api.
+	response, err := t.backref.api.
 		R().
 		SetResult(result).
-		SetAuthToken(t.backref.token).
 		Get("/api/v2/tokens/")
+
 	if err != nil {
 		slog.Error("error performing GET API request", "error", err)
 		return nil, err

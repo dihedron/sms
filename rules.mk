@@ -199,7 +199,7 @@ ifeq ($(_RULES_MK_ENABLE_CGO),1)
 	@echo -e " - tidy dependencies: $(green)enabled$(reset)"
 	@go mod tidy
 else
-	@echo -e " - tidy dependencies" $(yellow)disabled$(reset)""
+	@echo -e " - tidy dependencies: $(yellow)disabled$(reset)"
 endif
 ifeq ($(DOCKER),true)
 	$(eval cvsflags=-buildvcs=false)
