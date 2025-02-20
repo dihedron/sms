@@ -44,12 +44,12 @@ func (cmd *Ping) Execute(args []string) error {
 	defer client.Close()
 
 	if _, err := client.Token.List(); err != nil {
-		slog.Error("error listing tokens", "error", err)
+		slog.Error("error performing token list API call", "error", err)
 		fmt.Printf("connection: %s\n", color.RedString("KO"))
-		return fmt.Errorf("error connecting to server: %w", err)
+		return fmt.Errorf("error performing API call: %w", err)
 	}
 
-	slog.Debug("tokens listed")
+	slog.Debug("successful token list API call")
 	fmt.Printf("connection: %s\n", color.GreenString("OK"))
 	return nil
 }
