@@ -6,14 +6,26 @@ import (
 	"time"
 )
 
-type Query struct {
+type ListRequest struct {
 	Path        string            `json:"path" validate:"required"`
 	PathParams  map[string]string `json:"path_params" validate:"required"`
 	QueryParams map[string]string `json:"query_params" validate:"required"`
 	PageSize    *int              `json:"page_size,omitempty"`
 }
 
-func doQuery(client *Client, query *Query) ([]Token, error) {
+type ListResponse struct {
+	TotPages               int     `json:"tot_pages"`
+	CurrentPageFirstRecord int     `json:"current_page_first_record"`
+	CurrentPageLastRecord  int     `json:"current_page_last_record"`
+	Limit                  int     `json:"limit"`
+	Offset                 int     `json:"offset"`
+	Count                  int     `json:"count"`
+	CountIsEstimate        bool    `json:"count_is_estimate"`
+	Next                   *string `json:"next"`
+	Previous               *string `json:"previous"`
+}
+
+func doQuery(client *Client, query *ListRequest) ([]Token, error) {
 
 	tokens := []Token{}
 
@@ -49,7 +61,7 @@ func doQuery(client *Client, query *Query) ([]Token, error) {
 			slog.Error("error performing GET API request", "error", err)
 			return nil, err
 		}
-		tokens = append(tokens, result.Results...)
+		tokens = append(tokens, result.Tokens...)
 
 		if result.TotPages == 1 || offset >= result.TotPages {
 			slog.Debug("no more pages")
