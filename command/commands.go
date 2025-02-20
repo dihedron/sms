@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/dihedron/sms/command/ping"
+	"github.com/dihedron/sms/command/token"
 	"github.com/dihedron/sms/command/version"
 )
 
@@ -28,17 +29,17 @@ type Commands struct {
 	} `command:"account" alias:"a" description:"Account-related operations."`
 
 	Token struct {
-		// Create is the command to create a new token.
-		Create string `command:"create" alias:"c" description:"Create a new token."`
+		// // Create is the command to create a new token.
+		// Create string `command:"create" alias:"c" description:"Create a new token."`
 
-		// Delete is the command to delete a token.
-		Delete string `command:"delete" alias:"d" description:"Delete a token."`
+		// // Delete is the command to delete a token.
+		// Delete string `command:"delete" alias:"d" description:"Delete a token."`
 
 		// List is the command to list tokens.
-		List string `command:"list" alias:"l" description:"List tokens."`
+		List token.List `command:"list" alias:"l" description:"List tokens."`
 
 		// Refresh is the command to refresh a token.
-		Refresh string `command:"refresh" alias:"r" description:"Refresh a token."`
+		// Refresh string `command:"refresh" alias:"r" description:"Refresh a token."`
 	} `command:"token" alias:"t" description:"Token-related operations."`
 
 	// Version prints the application version information and exits.

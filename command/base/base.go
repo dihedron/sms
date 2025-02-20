@@ -8,6 +8,10 @@ import (
 )
 
 type Command struct {
+	// Token is the authentication token.
+	Token string `short:"t" long:"token" description:"The token to use for authentication." required:"yes" env:"SMS_TOKEN" cfg:"token"`
+	// Endpoint is the API endpoint.
+	Endpoint string `short:"e" long:"endpoint" description:"The API endpoint to use." required:"yes" env:"SMS_ENDPOINT" cfg:"endpoint" default:"https://platform.rdcom.com"`
 	// SkipVerifyTLS sets whether to skip TLS verification.
 	SkipVerifyTLS bool `short:"S" long:"skip-verify-tls" description:"Whether to skip TLS verification." optional:"yes" hidden:"yes" env:"SMS_SKIP_TLS_VERIFY"`
 	// EnableDebug sets whether to enable debug info in API calls.
