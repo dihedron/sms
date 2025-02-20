@@ -1,10 +1,12 @@
 package ping
 
 import (
+	"fmt"
 	"log/slog"
 
 	"github.com/dihedron/sms/command/base"
 	"github.com/dihedron/sms/rdcom"
+	"github.com/fatih/color"
 )
 
 type Ping struct {
@@ -43,9 +45,11 @@ func (cmd *Ping) Execute(args []string) error {
 
 	if _, err := client.Token.List(); err != nil {
 		slog.Error("error listing tokens", "error", err)
-		return err
+		fmt.Printf("connection: %s\n", color.RedString("KO"))
+		return fmt.Errorf("error connecting to server: %w", err)
 	}
 
 	slog.Debug("tokens listed")
+	fmt.Printf("connection: %s\n", color.GreenString("OK"))
 	return nil
 }

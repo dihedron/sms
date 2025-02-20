@@ -3,7 +3,6 @@ package rdcom
 import (
 	"fmt"
 	"log/slog"
-	"time"
 )
 
 type ListRequest struct {
@@ -13,7 +12,7 @@ type ListRequest struct {
 	PageSize    *int              `json:"page_size,omitempty"`
 }
 
-type ListResponse struct {
+type ListResponse[T any] struct {
 	TotPages               int     `json:"tot_pages"`
 	CurrentPageFirstRecord int     `json:"current_page_first_record"`
 	CurrentPageLastRecord  int     `json:"current_page_last_record"`
@@ -23,11 +22,12 @@ type ListResponse struct {
 	CountIsEstimate        bool    `json:"count_is_estimate"`
 	Next                   *string `json:"next"`
 	Previous               *string `json:"previous"`
+	Results                []T     `json:"results"`
 }
 
-func doQuery(client *Client, query *ListRequest) ([]Token, error) {
+func doQuery[T any](client *Client, query *ListRequest) ([]T, error) {
 
-	tokens := []Token{}
+	results := make([]T, 0)
 
 	request := client.api.R()
 
@@ -41,7 +41,7 @@ func doQuery(client *Client, query *ListRequest) ([]Token, error) {
 		request.SetPathParams(query.PathParams)
 	}
 
-	result := &TokenListResponse{}
+	result := &ListResponse[T]{}
 
 	offset := 0
 	for {
@@ -61,13 +61,13 @@ func doQuery(client *Client, query *ListRequest) ([]Token, error) {
 			slog.Error("error performing GET API request", "error", err)
 			return nil, err
 		}
-		tokens = append(tokens, result.Tokens...)
+		results = append(results, result.Results...)
 
 		if result.TotPages == 1 || offset >= result.TotPages {
 			slog.Debug("no more pages")
 			break
 		}
-		time.Sleep(1 * time.Second)
+		//time.Sleep(1 * time.Second)
 	}
-	return tokens, nil
+	return results, nil
 }

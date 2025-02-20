@@ -9,7 +9,6 @@ import (
 
 type Check struct {
 	base.Command
-
 	Username string `short:"u" long:"username" description:"The username to use for authentication." required:"yes" env:"SMS_USERNAME" cfg:"username"`
 	Password string `short:"p" long:"password" description:"The password to use for authentication." required:"yes" env:"SMS_PASSWORD" cfg:"password"`
 	Endpoint string `short:"e" long:"endpoint" description:"The API endpoint to use." required:"yes" env:"SMS_ENDPOINT" cfg:"endpoint" default:"https://platform.rdcom.com"`

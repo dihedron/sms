@@ -50,6 +50,7 @@ func WithSkipTLSVerify(insecure bool) Option {
 		c.api.SetTLSClientConfig(&tls.Config{
 			InsecureSkipVerify: insecure,
 		})
+		c.api.SetDisableWarn(true)
 	}
 }
 

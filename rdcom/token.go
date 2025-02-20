@@ -2,7 +2,6 @@ package rdcom
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 	"time"
 
@@ -32,11 +31,6 @@ func (t *TokenService) Create() error {
 	return nil
 }
 
-type TokenListResponse struct {
-	ListResponse `json:",inline"`
-	Tokens       []Token `json:"results"`
-}
-
 type Token struct {
 	Token      string    `json:"token"`
 	ExpiryDate time.Time `json:"expire_date"`
@@ -49,22 +43,23 @@ func (t *TokenService) List() ([]Token, error) {
 		return nil, errors.New("invalid token")
 	}
 
-	tokens, err := doQuery(t.backref, &ListRequest{
+	tokens, err := doQuery[Token](t.backref, &ListRequest{
 		Path:     "/api/v2/tokens/",
 		PageSize: pointer.To(1),
 	})
 	if err != nil {
+		slog.Error("error placinf API call", "error", err)
 		return nil, err
 	}
 
-	for _, token := range tokens {
-		expiry := token.ExpiryDate
-		if expiry.IsZero() {
-			fmt.Printf("token: %s (no expiration)\n", token.Token)
-		} else {
-			fmt.Printf("token: %s (expires on %s)\n", token.Token, expiry.Format(time.RFC3339))
-		}
-	}
-
+	// for _, token := range tokens {
+	// 	expiry := token.ExpiryDate
+	// 	if expiry.IsZero() {
+	// 		fmt.Printf("token: %s (no expiration)\n", token.Token)
+	// 	} else {
+	// 		fmt.Printf("token: %s (expires on %s)\n", token.Token, expiry.Format(time.RFC3339))
+	// 	}
+	// }
+	slog.Debug("API call success")
 	return tokens, nil
 }
