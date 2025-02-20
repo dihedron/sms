@@ -8,8 +8,6 @@ import (
 )
 
 type Command struct {
-	// Token is the authentication token.
-	Token string `short:"t" long:"token" description:"The token to use for authentication." required:"yes" env:"SMS_TOKEN" cfg:"token"`
 	// Endpoint is the API endpoint.
 	Endpoint string `short:"e" long:"endpoint" description:"The API endpoint to use." required:"yes" env:"SMS_ENDPOINT" cfg:"endpoint" default:"https://platform.rdcom.com"`
 	// SkipVerifyTLS sets whether to skip TLS verification.
@@ -24,6 +22,21 @@ type Command struct {
 	MemProfile *string `short:"M" long:"mem-profile" description:"The (optional) path where the memory profiler will store its data." optional:"yes"`
 }
 
+type TokenCommand struct {
+	Command
+	// Token is the authentication token.
+	Token *string `short:"t" long:"token" description:"The token to use for authentication." required:"yes" env:"SMS_TOKEN" cfg:"token"`
+}
+
+type CredentialsCommand struct {
+	Command
+	// Username is the username to use in API calls' basic authentication.
+	Username string `short:"u" long:"username" description:"The username to use for authentication." required:"yes" env:"SMS_USERNAME" cfg:"username"`
+	// Password is the password to use in API calls' basic authentication.
+	Password string `short:"p" long:"password" description:"The password to use for authentication." required:"yes" env:"SMS_PASSWORD" cfg:"password"`
+}
+
+// ProfileCPU creates a pprof CPU profile of the running application.
 func (cmd *Command) ProfileCPU() *Closer {
 	var f *os.File
 	if cmd.CPUProfile != nil {
@@ -41,6 +54,7 @@ func (cmd *Command) ProfileCPU() *Closer {
 	}
 }
 
+// ProfileMemory creates a memory profile of the running application.
 func (cmd *Command) ProfileMemory() {
 	if cmd.MemProfile != nil {
 		f, err := os.Create(*cmd.MemProfile)
@@ -55,10 +69,12 @@ func (cmd *Command) ProfileMemory() {
 	}
 }
 
+// Closer is used to keep a reference to the file used for profiling.
 type Closer struct {
 	file *os.File
 }
 
+// Close closes the file used for profiling.
 func (c *Closer) Close() {
 	if c.file != nil {
 		pprof.StopCPUProfile()

@@ -10,14 +10,14 @@ import (
 )
 
 type Ping struct {
-	base.Command
-
-	Account string `short:"a" long:"account" description:"The account to use for authentication." required:"yes" env:"SMS_ACCOUNT" cfg:"account"`
+	base.TokenCommand
+	// Account is the account to use in APIs invocation.
+	// Account string `short:"a" long:"account" description:"The account to use for authentication." required:"yes" env:"SMS_ACCOUNT" cfg:"account"`
 }
 
 // Execute is the real implementation of the Ping command.
 func (cmd *Ping) Execute(args []string) error {
-	slog.Debug("called ping command", "token", cmd.Token, "endpoint", cmd.Endpoint, "account", cmd.Account)
+	slog.Debug("called ping command", "token", cmd.Token, "endpoint", cmd.Endpoint)
 
 	options := []rdcom.Option{
 		rdcom.WithBaseURL(cmd.Endpoint),
@@ -31,8 +31,8 @@ func (cmd *Ping) Execute(args []string) error {
 	if cmd.EnableTrace {
 		options = append(options, rdcom.WithTrace())
 	}
-	if cmd.Token != "" {
-		options = append(options, rdcom.WithAuthToken(cmd.Token))
+	if cmd.Token != nil {
+		options = append(options, rdcom.WithAuthToken(*cmd.Token))
 	}
 
 	client := rdcom.New(options...)
