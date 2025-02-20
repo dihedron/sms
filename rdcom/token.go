@@ -55,3 +55,22 @@ func (t *TokenService) Create() (*Token, error) {
 	slog.Debug("API call success")
 	return token, nil
 }
+
+// Delete deletes one or more tokens.
+func (t *TokenService) Delete(tokens ...string) (*Token, error) {
+	if t.backref.token == "" {
+		slog.Error("invalid token")
+		return nil, errors.New("invalid token")
+	}
+	token, err := doPost[Token](t.backref, &PostRequest{
+		Request: Request{
+			Path: "/api/v2/tokens/",
+		},
+	})
+	if err != nil {
+		slog.Error("error placing API call", "error", err)
+		return nil, err
+	}
+	slog.Debug("API call success")
+	return token, nil
+}

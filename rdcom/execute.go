@@ -86,3 +86,25 @@ func doPost[T any](client *Client, info *PostRequest) (*T, error) {
 	}
 	return result, nil
 }
+
+type DeleteRequest struct {
+	Request `json:",inline"`
+}
+
+func doDelete[T any](client *Client, info *DeleteRequest) (*T, error) {
+	request := client.api.R()
+	result := new(T)
+
+	_, err := request.
+		SetResult(result).
+		SetBody(Token{
+			Value: "aaaa",
+		})
+	Delete(info.Path)
+
+	if err != nil {
+		slog.Error("error performing POST API request", "error", err)
+		return nil, err
+	}
+	return result, nil
+}
