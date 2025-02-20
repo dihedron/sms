@@ -40,7 +40,7 @@ type Commands struct {
 
 		// Refresh is the command to refresh a token.
 		// Refresh string `command:"refresh" alias:"r" description:"Refresh a token."`
-	} `command:"token" alias:"t" description:"Token-related operations."`
+	} `command:"token" alias:"t" description:"Token management operations."`
 
 	// Version prints the application version information and exits.
 	//lint:ignore SA5008 commands can have multiple aliases
