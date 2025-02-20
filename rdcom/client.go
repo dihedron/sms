@@ -16,7 +16,7 @@ type Client struct {
 	password string
 	account  string `validate:"required"`
 	token    string
-	Token    *Token
+	Token    *TokenService
 }
 
 // Service represents an API service.
@@ -97,7 +97,7 @@ func New(options ...Option) *Client {
 	for _, option := range options {
 		option(c)
 	}
-	c.Token = &Token{Service{backref: c}}
+	c.Token = &TokenService{Service{backref: c}}
 	// initialise more services here...
 
 	// perform struct level validation

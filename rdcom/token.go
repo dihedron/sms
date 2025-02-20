@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"log/slog"
 	"time"
+
+	"github.com/dihedron/sms/pointer"
 )
 
-type Token struct {
+type TokenService struct {
 	Service
 }
 
-func (t *Token) Create() error {
+func (t *TokenService) Create() error {
 	if t.backref.username == "" || t.backref.password == "" {
 		slog.Error("invalid credentials")
 		return errors.New("invalid credentials")
@@ -30,42 +32,59 @@ func (t *Token) Create() error {
 	return nil
 }
 
-type ListResponse struct {
-	TotPages               int  `json:"tot_pages"`
-	CurrentPageFirstRecord int  `json:"current_page_first_record"`
-	CurrentPageLastRecord  int  `json:"current_page_last_record"`
-	Limit                  int  `json:"limit"`
-	Offset                 int  `json:"offset"`
-	Count                  int  `json:"count"`
-	CountIsEstimate        bool `json:"count_is_estimate"`
-	Next                   int  `json:"next"`
-	Previous               int  `json:"previous"`
-	Results                []struct {
-		Token      string    `json:"token"`
-		ExpireDate time.Time `json:"expire_date"`
-	} `json:"results"`
+type TokenListResponse struct {
+	TotPages               int     `json:"tot_pages"`
+	CurrentPageFirstRecord int     `json:"current_page_first_record"`
+	CurrentPageLastRecord  int     `json:"current_page_last_record"`
+	Limit                  int     `json:"limit"`
+	Offset                 int     `json:"offset"`
+	Count                  int     `json:"count"`
+	CountIsEstimate        bool    `json:"count_is_estimate"`
+	Next                   *string `json:"next"`
+	Previous               *string `json:"previous"`
+	Results                []Token `json:"results"`
 }
 
-func (t *Token) List() ([]string, error) {
+type Token struct {
+	Token      string    `json:"token"`
+	ExpiryDate time.Time `json:"expire_date"`
+}
+
+func (t *TokenService) List() ([]Token, error) {
 
 	if t.backref.token == "" {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
 
-	result := &ListResponse{}
-	response, err := t.backref.api.
-		R().
-		SetResult(result).
-		Get("/api/v2/tokens/")
-
+	tokens, err := doQuery(t.backref, &Query{
+		Path:     "/api/v2/tokens/",
+		PageSize: pointer.To(1),
+	})
 	if err != nil {
-		slog.Error("error performing GET API request", "error", err)
 		return nil, err
 	}
 
-	for _, token := range result.Results {
-		expiry := token.ExpireDate
+	// tokens := []Token{}
+
+	// result := &TokenListResponse{}
+	// response, err := t.backref.api.
+	// 	R().
+	// 	SetQueryParam("paginated-view", fmt.Sprintf("%d", page)).
+	// 	SetResult(result).
+	// 	Get("/api/v2/tokens/")
+
+	// if err != nil {
+	// 	slog.Error("error performing GET API request", "error", err)
+	// 	return nil, err
+	// }
+
+	// slog.Debug("API response", "response", response)
+
+	// tokens = append(tokens, result.Results...)
+
+	for _, token := range tokens {
+		expiry := token.ExpiryDate
 		if expiry.IsZero() {
 			fmt.Printf("token: %s (no expiration)\n", token.Token)
 		} else {
@@ -73,7 +92,5 @@ func (t *Token) List() ([]string, error) {
 		}
 	}
 
-	slog.Debug("API response", "response", response)
-
-	return nil, nil
+	return tokens, nil
 }
