@@ -8,23 +8,51 @@ import (
 	"resty.dev/v3"
 )
 
+// AuthType represents the available authentication types.
+type AuthType int8
+
+// List of available authentication types.
+const (
+	BasicAuth AuthType = iota
+	TokenAuth
+)
+
 // Client is the API client.
 type Client struct {
-	api      *resty.Client
+	// api is the underlying API client using Resty.
+	api *resty.Client
+	// agent is the user agent to use in HTTP requests to the API.
+	agent string
+	// endpoint is the base URL for API requests.
 	endpoint string `validate:"required"`
+	// username is used with password to perform basic authentication.
 	username string
+	// password is used to perform basic authentication.
 	password string
-	account  string `validate:"required"`
-	token    string
-	Token    *TokenService
+	// token is the authentication token to use in requests.
+	token string
+	// account is the ID of the account to use ito scope requests.
+	account string `validate:"required"`
+	// TokenService is the Token service
+	TokenService *TokenService
 }
 
 // Service represents an API service.
 type Service struct {
-	backref *Client
+	client *Client
 }
 
+// option allows to set options in a functional way.
 type Option func(*Client)
+
+// WithUserAgent sets the API client user agent
+func WithUserAgent(agent string) Option {
+	return func(c *Client) {
+		slog.Debug("setting user agent", "agent", agent)
+		c.agent = agent
+		c.api.SetHeader("User-Agent", agent)
+	}
+}
 
 // WithBaseURL sets the API endpoint.
 func WithBaseURL(endpoint string) Option {
@@ -98,8 +126,8 @@ func New(options ...Option) *Client {
 	for _, option := range options {
 		option(c)
 	}
-	c.Token = &TokenService{Service{backref: c}}
-	// initialise more services here...
+	c.TokenService = &TokenService{Service{client: c}}
+	// TODO: initialise more services here...
 
 	// perform struct level validation
 	validate := validator.New()
@@ -108,8 +136,12 @@ func New(options ...Option) *Client {
 		slog.Error("invalid API client configuration", "error", err)
 		return nil
 	}
-
+	slog.Debug("API client ready")
 	return c
+}
+
+func (c *Client) Do() {
+
 }
 
 // Close frees the API client resources.
@@ -139,9 +171,9 @@ func check(sl validator.StructLevel) {
 		sl.ReportError(client.endpoint, "endpoint", "Endpoint", "required", "")
 	}
 
-	if client.Token.backref == nil {
+	if client.TokenService.client == nil {
 		slog.Error("token service not initialised")
-		sl.ReportError(client.Token.backref, "backref", "Token.Service", "service", "")
+		sl.ReportError(client.TokenService.client, "client", "Token.Service", "service", "")
 	}
 
 	// add more services here...

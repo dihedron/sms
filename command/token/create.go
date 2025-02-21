@@ -21,6 +21,7 @@ func (cmd *Create) Execute(args []string) error {
 
 	options := []rdcom.Option{
 		rdcom.WithBaseURL(cmd.Endpoint),
+		rdcom.WithUserAgent("bancaditalia/0.1"),
 	}
 	if cmd.SkipVerifyTLS {
 		options = append(options, rdcom.WithSkipTLSVerify(true))
@@ -44,7 +45,7 @@ func (cmd *Create) Execute(args []string) error {
 
 	defer client.Close()
 
-	token, err := client.Token.Create()
+	token, err := client.TokenService.Create()
 	if err != nil {
 		slog.Error("error performing token create API call", "error", err)
 		fmt.Printf("error: %s\n", color.RedString(err.Error()))

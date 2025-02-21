@@ -25,6 +25,7 @@ func (cmd *Delete) Execute(args []string) error {
 
 	options := []rdcom.Option{
 		rdcom.WithBaseURL(cmd.Endpoint),
+		rdcom.WithUserAgent("bancaditalia/0.1"),
 	}
 	if cmd.SkipVerifyTLS {
 		options = append(options, rdcom.WithSkipTLSVerify(true))
@@ -48,18 +49,20 @@ func (cmd *Delete) Execute(args []string) error {
 
 	defer client.Close()
 
-	token, err := client.Token.Delete(args...)
-	if err != nil {
-		slog.Error("error performing token create API call", "error", err)
-		fmt.Printf("error: %s\n", color.RedString(err.Error()))
-		return fmt.Errorf("error performing API call: %w", err)
-	}
+	for _, arg := range args {
+		token, err := client.TokenService.Delete(arg)
+		if err != nil {
+			slog.Error("error performing token create API call", "error", err)
+			fmt.Printf("error: %s\n", color.RedString(err.Error()))
+			return fmt.Errorf("error performing API call: %w", err)
+		}
 
-	expiry := token.ExpiryDate
-	if expiry.IsZero() {
-		fmt.Printf("token: %s (no expiration)\n", color.YellowString(token.Token))
-	} else {
-		fmt.Printf("token: %s (expires on %s)\n", color.YellowString(token.Token), color.YellowString(expiry.Format(time.RFC3339)))
+		expiry := token.ExpiryDate
+		if expiry.IsZero() {
+			fmt.Printf("token: %s (no expiration)\n", color.YellowString(token.Token))
+		} else {
+			fmt.Printf("token: %s (expires on %s)\n", color.YellowString(token.Token), color.YellowString(expiry.Format(time.RFC3339)))
+		}
 	}
 	return nil
 }

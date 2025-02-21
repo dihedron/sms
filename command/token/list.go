@@ -21,6 +21,7 @@ func (cmd *List) Execute(args []string) error {
 
 	options := []rdcom.Option{
 		rdcom.WithBaseURL(cmd.Endpoint),
+		rdcom.WithUserAgent("bancaditalia/0.1"),
 	}
 	if cmd.SkipVerifyTLS {
 		options = append(options, rdcom.WithSkipTLSVerify(true))
@@ -38,7 +39,7 @@ func (cmd *List) Execute(args []string) error {
 	client := rdcom.New(options...)
 	defer client.Close()
 
-	tokens, err := client.Token.List()
+	tokens, err := client.TokenService.List()
 	if err != nil {
 		slog.Error("error performing token list API call", "error", err)
 		fmt.Printf("error: %s\n", color.RedString(err.Error()))

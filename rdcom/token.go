@@ -19,11 +19,11 @@ type Token struct {
 
 // List returns the list of tokens.
 func (t *TokenService) List() ([]Token, error) {
-	if t.backref.token == "" {
+	if t.client.token == "" {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
-	tokens, err := doGet[Token](t.backref, &GetRequest{
+	tokens, err := doGet[Token](t.client, &GetRequest{
 		Request: Request{
 			Path: "/api/v2/tokens/",
 		},
@@ -39,11 +39,11 @@ func (t *TokenService) List() ([]Token, error) {
 
 // Create creates a new token.
 func (t *TokenService) Create() (*Token, error) {
-	if t.backref.token == "" {
+	if t.client.token == "" {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
-	token, err := doPost[Token](t.backref, &PostRequest{
+	token, err := doPost[Token](t.client, &PostRequest{
 		Request: Request{
 			Path: "/api/v2/tokens/",
 		},
@@ -57,14 +57,19 @@ func (t *TokenService) Create() (*Token, error) {
 }
 
 // Delete deletes one or more tokens.
-func (t *TokenService) Delete(tokens ...string) (*Token, error) {
-	if t.backref.token == "" {
+func (t *TokenService) Delete(token string) (*Token, error) {
+
+	if t.client.token == "" {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
-	token, err := doPost[Token](t.backref, &PostRequest{
+
+	response, err := doDelete[Token](t.client, &DeleteRequest[Token]{
 		Request: Request{
 			Path: "/api/v2/tokens/",
+		},
+		Value: Token{
+			Token: token,
 		},
 	})
 	if err != nil {
@@ -72,5 +77,5 @@ func (t *TokenService) Delete(tokens ...string) (*Token, error) {
 		return nil, err
 	}
 	slog.Debug("API call success")
-	return token, nil
+	return response, nil
 }
