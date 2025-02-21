@@ -2,6 +2,8 @@
 
 Send SMS messages using RDCom API.
 
+Platform access at the [Portal](https://platform.rdcom.com).
+
 API info at [API site](https://docs.rdcom.com/docs/platform/intro).
 
 

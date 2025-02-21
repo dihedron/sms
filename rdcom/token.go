@@ -3,9 +3,8 @@ package rdcom
 import (
 	"errors"
 	"log/slog"
+	"net/http"
 	"time"
-
-	"github.com/dihedron/sms/pointer"
 )
 
 type TokenService struct {
@@ -23,18 +22,21 @@ func (t *TokenService) List() ([]Token, error) {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
-	tokens, err := doGet[Token](t.client, &GetRequest{
-		Request: Request{
-			Path: "/api/v2/tokens/",
-		},
-		PageSize: pointer.To(100),
-	})
+
+	call := &Call[any, ListResponse[Token]]{
+		Method: http.MethodGet,
+		Path:   "/api/v2/tokens",
+		Output: &ListResponse[Token]{},
+	}
+
+	result, err := Do(t.client, call)
+
 	if err != nil {
 		slog.Error("error placing API call", "error", err)
 		return nil, err
 	}
 	slog.Debug("API call success")
-	return tokens, nil
+	return result.Results, nil
 }
 
 // Create creates a new token.
