@@ -3,8 +3,9 @@ package rdcom
 import (
 	"errors"
 	"log/slog"
-	"net/http"
 	"time"
+
+	"github.com/dihedron/sms/pointer"
 )
 
 type TokenService struct {
@@ -12,8 +13,8 @@ type TokenService struct {
 }
 
 type Token struct {
-	Token      string    `json:"token"`
-	ExpiryDate time.Time `json:"expire_date"`
+	Token      string    `json:"token,omitzero"`
+	ExpiryDate time.Time `json:"expire_date,omitzero"`
 }
 
 // List returns the list of tokens.
@@ -23,20 +24,21 @@ func (t *TokenService) List() ([]Token, error) {
 		return nil, errors.New("invalid token")
 	}
 
-	call := &Call[any, ListResponse[Token]]{
-		Method: http.MethodGet,
-		Path:   "/api/v2/tokens",
-		Output: &ListResponse[Token]{},
+	options := &ListOptions{
+		Options: Options{
+			EntityPath: "/api/v2/tokens",
+		},
+		PageSize: pointer.To(100),
 	}
 
-	result, err := Do(t.client, call)
+	result, err := List[Token](t.client, options)
 
 	if err != nil {
 		slog.Error("error placing API call", "error", err)
 		return nil, err
 	}
 	slog.Debug("API call success")
-	return result.Results, nil
+	return result, nil
 }
 
 // Create creates a new token.
@@ -45,10 +47,8 @@ func (t *TokenService) Create() (*Token, error) {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
-	token, err := doPost[Token](t.client, &PostRequest{
-		Request: Request{
-			Path: "/api/v2/tokens/",
-		},
+	token, err := Create[Token](t.client, nil, &CreateOptions{
+		EntityPath: "/api/v2/tokens/",
 	})
 	if err != nil {
 		slog.Error("error placing API call", "error", err)

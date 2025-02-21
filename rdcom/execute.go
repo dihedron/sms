@@ -1,7 +1,6 @@
 package rdcom
 
 import (
-	"fmt"
 	"log/slog"
 )
 
@@ -9,6 +8,7 @@ type Request struct {
 	Path string `json:"path" validate:"required"`
 }
 
+/*
 type GetRequest struct {
 	Request     `json:",inline"`
 	PathParams  map[string]string `json:"path_params" validate:"required"`
@@ -54,6 +54,7 @@ func doGet[T any](client *Client, info *GetRequest) ([]T, error) {
 	}
 	return results, nil
 }
+*/
 
 type PostRequest struct {
 	Request `json:",inline"`

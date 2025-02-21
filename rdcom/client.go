@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"log/slog"
-	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	"resty.dev/v3"
@@ -142,85 +141,161 @@ func New(options ...Option) *Client {
 	return c
 }
 
-// Call is a struct that represents a specific API call, along with its optional
-// input data (to be placed in the request body) and its result.
-type Call[I any, O any] struct {
-	Method      string            `json:"method" yaml:"method" validate:"required"`
-	Path        string            `json:"path" yaml:"path" validate:"required"`
-	PathParams  map[string]string `json:"path_params" validate:"required"`
-	QueryParams map[string]string `json:"query_params" validate:"required"`
-	PageSize    *int              `json:"page_size,omitempty" yaml:"page_size,omitempty"`
-	Input       *I                `json:"input" yaml:"input"`
-	Output      *O                `json:"output" yaml:"output"`
-}
-
-// ListResponse is the response to List requests.
-type ListResponse[T any] struct {
-	TotPages               int     `json:"tot_pages"`
-	CurrentPageFirstRecord int     `json:"current_page_first_record"`
-	CurrentPageLastRecord  int     `json:"current_page_last_record"`
-	Limit                  int     `json:"limit"`
-	Offset                 int     `json:"offset"`
-	Count                  int     `json:"count"`
-	CountIsEstimate        bool    `json:"count_is_estimate"`
-	Next                   *string `json:"next"`
-	Previous               *string `json:"previous"`
-	Results                []T     `json:"results"`
-}
-
-// Do performs an API request.
-func Do[I any, O any](client *Client, call *Call[I, O]) (*O, error) {
-	var err error
-	request := client.api.R()
-
-	if call.QueryParams != nil {
-		slog.Debug("setting query params", "values", call.QueryParams)
-		request.SetQueryParams(call.QueryParams)
-	}
-
-	if call.PathParams != nil {
-		slog.Debug("setting path params", "values", call.PathParams)
-		request.SetPathParams(call.PathParams)
-	}
-
-	if call.Input != nil {
-		slog.Debug("setting input struct", "type", fmt.Sprintf("%T", call.Output))
-		request.SetBody(call.Input)
-	} else {
-		slog.Debug("no input struct provided")
-	}
-
-	if call.Output != nil {
-		slog.Debug("setting output struct", "type", fmt.Sprintf("%T", call.Output))
-		request.SetResult(call.Output)
-	} else {
-		slog.Warn("no output struct provided")
-	}
-
-	switch call.Method {
-	case http.MethodGet:
-		_, err = request.Get(call.Path)
-	case http.MethodPost:
-		_, err = request.Post(call.Path)
-	case http.MethodDelete:
-		_, err = request.Delete(call.Path)
-	default:
-		slog.Error("unsupported method", "method", call.Method)
-		return nil, fmt.Errorf("unsupported method: %s", call.Method)
-	}
-
-	if err != nil {
-		slog.Error("error performing API request", "method", call.Method, "path", call.Path, "error", err)
-		return nil, err
-	}
-
-	slog.Debug("API call successful", "method", call.Method, "path", call.Path)
-	return call.Output, nil
-}
-
 // Close frees the API client resources.
 func (c *Client) Close() error {
 	return c.api.Close()
+}
+
+// Options is a struct that contains the outline of an API call
+// options.
+type Options struct {
+	EntityPath  string            `json:"entity_path" yaml:"entity_path" validate:"required"`
+	PathParams  map[string]string `json:"path_params" validate:"required"`
+	QueryParams map[string]string `json:"query_params" validate:"required"`
+}
+
+type GetOptions Options
+
+// Get performs an API request to retrieve one single entity.
+func Get[T any](client *Client, options *GetOptions) (*T, error) {
+	var err error
+	request := client.api.R()
+
+	if options.QueryParams != nil {
+		slog.Debug("setting query params", "values", options.QueryParams)
+		request.SetQueryParams(options.QueryParams)
+	}
+
+	if options.PathParams != nil {
+		slog.Debug("setting path params", "values", options.PathParams)
+		request.SetPathParams(options.PathParams)
+	}
+
+	// if options.Input != nil {
+	// 	slog.Debug("setting input struct", "type", fmt.Sprintf("%T", options.Output))
+	// 	request.SetBody(options.Input)
+	// } else {
+	// 	slog.Debug("no input struct provided")
+	// }
+
+	// if options.Output != nil {
+	// 	slog.Debug("setting output struct", "type", fmt.Sprintf("%T", options.Output))
+	// 	request.SetResult(options.Output)
+	// } else {
+	// 	slog.Warn("no output struct provided")
+	// }
+
+	result := new(T)
+	request.SetResult(result)
+	_, err = request.Get(options.EntityPath)
+
+	// switch options.Method {
+	// case http.MethodGet:
+	// 	_, err = request.Get(call.Path)
+	// case http.MethodPost:
+	// 	_, err = request.Post(call.Path)
+	// case http.MethodDelete:
+	// 	_, err = request.Delete(call.Path)
+	// default:
+	// 	slog.Error("unsupported method", "method", call.Method)
+	// 	return nil, fmt.Errorf("unsupported method: %s", call.Method)
+	// }
+
+	if err != nil {
+		slog.Error("error performing GET API request", "entity", options.EntityPath, "error", err)
+		return nil, err
+	}
+
+	slog.Debug("GET API options successful", "path", options.EntityPath)
+	return result, nil
+}
+
+type ListOptions struct {
+	Options  `json:",inline"`
+	PageSize *int `json:"page_size,omitempty" yaml:"page_size,omitempty"`
+}
+
+// List performs an API request to retrieve multiple entities, possibly using pagination.
+func List[T any](client *Client, options *ListOptions) ([]T, error) {
+	request := client.api.R()
+
+	if options.QueryParams != nil {
+		slog.Debug("setting query params", "values", options.QueryParams)
+		request.SetQueryParams(options.QueryParams)
+	}
+
+	if options.PathParams != nil {
+		slog.Debug("setting path params", "values", options.PathParams)
+		request.SetPathParams(options.PathParams)
+	}
+
+	type payload[T any] struct {
+		TotPages               int     `json:"tot_pages"`
+		CurrentPageFirstRecord int     `json:"current_page_first_record"`
+		CurrentPageLastRecord  int     `json:"current_page_last_record"`
+		Limit                  int     `json:"limit"`
+		Offset                 int     `json:"offset"`
+		Count                  int     `json:"count"`
+		CountIsEstimate        bool    `json:"count_is_estimate"`
+		Next                   *string `json:"next"`
+		Previous               *string `json:"previous"`
+		Results                []T     `json:"results"`
+	}
+
+	results := make([]T, 0)
+	page := &payload[T]{}
+	offset := 0
+	for {
+		if options.PageSize != nil {
+			slog.Debug("enabling pagination", "page size", *options.PageSize)
+			request.SetQueryParam("paginated-view", "true")
+			request.SetQueryParam("limit", fmt.Sprintf("%d", *options.PageSize))
+			request.SetQueryParam("offset", fmt.Sprintf("%d", offset))
+			offset = offset + 1
+		}
+		_, err := request.
+			SetResult(page).
+			Get(options.EntityPath)
+
+		if err != nil {
+			slog.Error("error performing GET (many) API request", "error", err)
+			return nil, err
+		}
+		slog.Debug("API call successful", "count", len(page.Results))
+		results = append(results, page.Results...)
+
+		if page.TotPages == 1 || offset >= page.TotPages {
+			slog.Debug("no more pages")
+			break
+		}
+	}
+	return results, nil
+}
+
+type CreateOptions Options
+
+// Create performs an API request to create a new entity.
+func Create[T any](client *Client, entity *T, options *CreateOptions) (*T, error) {
+	request := client.api.R()
+
+	if entity != nil {
+		slog.Debug("setting entity", "type", fmt.Sprintf("%T", entity), "value", *entity)
+		request.SetBody(entity)
+	} else {
+		slog.Warn("no entity provided?")
+	}
+
+	result := new(T)
+	_, err := request.
+		SetResult(result).
+		Post(options.EntityPath)
+
+	if err != nil {
+		slog.Error("error performing POST API request", "error", err)
+		return nil, err
+	}
+	slog.Debug("API call success", "result", result)
+	return result, nil
 }
 
 func check(sl validator.StructLevel) {
