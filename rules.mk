@@ -29,7 +29,7 @@ _RULES_MK_VARS_VERSION ?= $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSI
 _RULES_MK_VARS_MAINTAINER ?= <your-email>@gmail.com
 _RULES_MK_VARS_VENDOR ?= <your-email>@gmail.com
 _RULES_MK_VARS_PRODUCER_URL ?= https://github.com/<your-github-username>/
-_RULES_MK_VARS_DOWNLOAD_URL ?= $(_RULES_MK_VARS_PRODUCER_URL)$$(_RULES_MK_VARS_NAME)
+_RULES_MK_VARS_DOWNLOAD_URL ?= $(_RULES_MK_VARS_PRODUCER_URL)$(_RULES_MK_VARS_NAME)
 _RULES_MK_VARS_METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/version
 _RULES_MK_VARS_DOTENV_VAR_NAME ?= $$(echo $(_RULES_MK_VARS_NAME) | tr '[:lower:]' '[:upper:]' | tr '-' '_')_DOTENV
 
@@ -46,6 +46,15 @@ _RULES_MK_FLAG_STRIP_SYMBOLS ?= 0
 _RULES_MK_FLAG_STRIP_DBG_INFO ?= 0
 _RULES_MK_FLAG_FORCE_DEP_REBUILD ?= 0
 _RULES_MK_FLAG_OMIT_VCS_INFO ?= 0
+
+#
+# Set this flag to 1 to enable automatic dependency tidying.
+#
+ifneq ($(_RULES_MK_FLAG_TIDY_DEPS),1)
+	_RULES_MK_FLAG_TIDY_DEPS := 0
+else # neet to enable CGO
+	_RULES_MK_FLAG_TIDY_DEPS := 1
+endif
 
 #
 # In order to enable race detector, the _RULES_MK_FLAG_ENABLE_RACE
@@ -213,7 +222,7 @@ show-build-vars: ## show actual build variables values
 	@[ -t 1 ] && piped=0 || piped=1 ; echo "piped=$${piped}" > .piped
 #	@echo ""
 	@echo -e "Build Flags:"
-ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
+ifeq ($(_RULES_MK_FLAG_TIDY_DEPS),1)
 	@echo -e " - tidy dependencies               : $(green)enabled$(reset)"
 	@go mod tidy
 else
@@ -278,6 +287,7 @@ else
 	@echo -e " - race detector                   : $(yellow)disabled$(reset)"
 endif
 	@echo -e " - metadata package                : $(green)$(package)$(reset)"
+	@$(MAKE) show-build-vars
 	@for platform in "$(platforms)"; do \
 		if test "$(@)" = "$$platform"; then \
 			echo -e "PLATFORM: $(green)$(@)$(reset)"; \
@@ -423,14 +433,14 @@ ifeq ($(PLATFORM),)
 endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
-	@echo -e "Creating $(green)DEB$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
+	@echo -e "Creating $(green)DEB$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(_RULES_MK_VARS_VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
 	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager deb --target dist/$(PLATFORM)/
 	@rm -f .piped
 # @echo -e "PLATFORM: $(PLATFORM)"
 # @echo -e "GOOS: $(GOOS)"
 # @echo -e "GOARCH: $(GOARCH)"
 # @echo -e "_RULES_MK_VARS_NAME: $(_RULES_MK_VARS_NAME)"
-# @echo -e "VERSION: $(VERSION)"
+# @echo -e "_RULES_MK_VARS_VERSION: $(_RULES_MK_VARS_VERSION)"
 
 .PHONY: rpm
 rpm: ## package in RPM format the given PLATFORM (default: linux/amd64)
@@ -444,7 +454,7 @@ ifeq ($(PLATFORM),)
 endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
-	@echo -e "Creating $(green)RPM$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
+	@echo -e "Creating $(green)RPM$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(_RULES_MK_VARS_VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
 	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager rpm --target dist/$(PLATFORM)/
 	@rm -f .piped
 
@@ -460,7 +470,7 @@ ifeq ($(PLATFORM),)
 endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
-	@echo -e "Creating $(green)APK$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
+	@echo -e "Creating $(green)APK$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(_RULES_MK_VARS_VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
 	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager apk --target dist/$(PLATFORM)/
 	@rm -f .piped
 
@@ -486,7 +496,7 @@ docker-prompt: ## run a bash in the container to run builds
 help: ## show help message
 	@echo
 	@echo "    +-------------------------------+"
-	@echo -e "    | rules.mk version \033[36m$(_RULES_MK_CURRENT_VERSION)\033[0m |"
+	@echo -e "    | rules.mk version \033[36m$(_RULES_MK_FLAG_CURRENT_VERSION)\033[0m |"
 	@echo "    +-------------------------------+"
 	@awk 'BEGIN {FS = ":.*##"; printf "\nusage:\n  make \033[36m\033[0m\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
@@ -504,11 +514,11 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e "_RULES_MK_VARS_VERSION_MAJOR := 1 $(green)# replace with the major version$(reset)"
 	@echo -e "_RULES_MK_VARS_VERSION_MINOR := 0 $(green)# replace with the minor version$(reset) "
 	@echo -e "_RULES_MK_VARS_VERSION_PATCH := 2 $(green)# replace with the patch or revision$(reset)"
-	@echo -e '_RULES_MK_VARS_VERSION := $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSION_MINOR).$(_RULES_MK_VARS_VERSION_PATCH) $(green)# leave it like this unless you need to override$(reset) '
+	@echo -e '_RULES_MK_VARS_VERSION := $$(_RULES_MK_VARS_VERSION_MAJOR).$$(_RULES_MK_VARS_VERSION_MINOR).$$(_RULES_MK_VARS_VERSION_PATCH) $(green)# leave it like this unless you need to override$(reset) '
 	@echo -e "_RULES_MK_VARS_MAINTAINER := johanna.doe@example.com $(green)# replace with the email of the maintainer$(reset) "
 	@echo -e "_RULES_MK_VARS_VENDOR := koolsoft@example.com $(green)# replace with the email of the vendor$(reset) "
 	@echo -e "_RULES_MK_VARS_PRODUCER_URL := https://github.com/koolsoft/ $(green)# replace with the URL of the software producer$(reset)"
-	@echo -e "_RULES_MK_VARS_DOWNLOAD_URL := $(_RULES_MK_VARS_PRODUCER_URL)$$(_RULES_MK_VARS_NAME) $(green)# leave it like this unless you need to override$(reset)"
+	@echo -e '_RULES_MK_VARS_DOWNLOAD_URL := $$(_RULES_MK_VARS_PRODUCER_URL)$$(_RULES_MK_VARS_NAME) $(green)# leave it like this unless you need to override$(reset)'
 	@echo
 	@echo -e "include rules.mk $(green)# this is where the Make rules are imported$(reset)"
 	@echo
