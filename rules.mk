@@ -37,9 +37,9 @@ _RULES_MK_VARS_DOTENV_VAR_NAME ?= $$(echo $(_RULES_MK_VARS_NAME) | tr '[:lower:]
 # default feature flag values
 #
 _RULES_MK_TIDY_DEPS ?= 1
-_RULES_MK_ENABLE_CGO ?= 1
-_RULES_MK_ENABLE_GOGEN ?= 1
-_RULES_MK_ENABLE_RACE ?= 1
+_RULES_MK_FLAG_ENABLE_CGO ?= 1
+_RULES_MK_FLAG_ENABLE_GOGEN ?= 1
+_RULES_MK_FLAG_ENABLE_RACE ?= 1
 _RULES_MK_STATIC_LINK ?= 0
 _RULES_MK_ENABLE_NETGO ?= 0
 _RULES_MK_STRIP_SYMBOLS ?= 0
@@ -47,30 +47,30 @@ _RULES_MK_STRIP_DBG_INFO =? 0
 _RULES_MK_FORCE_DEP_REBUILD ?= 0
 
 #
-# In order to enable race detector, the _RULES_MK_ENABLE_RACE
+# In order to enable race detector, the _RULES_MK_FLAG_ENABLE_RACE
 # must be set to 1; any other value disables race detector;
 # note that the race detector requires CGO to be enabled.
 #
-ifneq ($(_RULES_MK_ENABLE_RACE),1)
-	_RULES_MK_ENABLE_RACE := 0
+ifneq ($(_RULES_MK_FLAG_ENABLE_RACE),1)
+	_RULES_MK_FLAG_ENABLE_RACE := 0
 else # neet to enable CGO
-	_RULES_MK_ENABLE_CGO := 1
+	_RULES_MK_FLAG_ENABLE_CGO := 1
 endif
 
 #
-# In order to enable CGO, the _RULES_MK_ENABLE_CGO must be
+# In order to enable CGO, the _RULES_MK_FLAG_ENABLE_CGO must be
 # set to 1; any other value disables CGO.
 #
-ifneq ($(_RULES_MK_ENABLE_CGO),1)
-	_RULES_MK_ENABLE_CGO := 0
+ifneq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
+	_RULES_MK_FLAG_ENABLE_CGO := 0
 endif
 
 #
-# In order to enable go generate, the _RULES_MK_ENABLE_GOGEN
+# In order to enable go generate, the _RULES_MK_FLAG_ENABLE_GOGEN
 # must be set to 1; any other value disables go generate.
 #
-ifneq ($(_RULES_MK_ENABLE_GOGEN),1)
-	_RULES_MK_ENABLE_GOGEN := 0
+ifneq ($(_RULES_MK_FLAG_ENABLE_GOGEN),1)
+	_RULES_MK_FLAG_ENABLE_GOGEN := 0
 endif
 
 #
@@ -207,7 +207,7 @@ show-build-vars: ## show actual build variables values
 	@[ -t 1 ] && piped=0 || piped=1 ; echo "piped=$${piped}" > .piped
 #	@echo ""
 	@echo -e "FLAGS:"
-ifeq ($(_RULES_MK_ENABLE_CGO),1)
+ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
 	@echo -e " - tidy dependencies: $(green)enabled$(reset)"
 	@go mod tidy
 else
@@ -216,13 +216,13 @@ endif
 ifeq ($(DOCKER),true)
 	$(eval cvsflags=-buildvcs=false)
 endif
-ifeq ($(_RULES_MK_ENABLE_GOGEN),1)
+ifeq ($(_RULES_MK_FLAG_ENABLE_GOGEN),1)
 	@echo -e " - go generate      : $(green)enabled$(reset)"
 	@go generate ./...
 else
 	@echo -e " - go generate      : $(yellow)disabled$(reset)"
 endif
-ifeq ($(_RULES_MK_ENABLE_CGO),1)
+ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
 	@echo -e " - CGO dependencies : $(green)enabled$(reset)"
 else
 	@echo -e " - CGO dependencies : $(yellow)disabled$(reset)"
@@ -248,13 +248,13 @@ ifeq ($(_RULES_MK_STRIP_SYMBOLS),1)
 	@echo -e " - linking          : $(green)static$(reset)"
 	$(eval strip_symbols=-s)
 endif
-ifeq ($(_RULES_MK_ENABLE_CGO),1)
+ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
 	$(eval linkmode=-linkmode 'external')
 endif
 ifeq ($(_RULES_MK_STATIC_LINK),1)
 	@echo -e " - linking          : $(green)static$(reset)"
 	$(eval static=-extldflags '-static')
-ifeq ($(_RULES_MK_ENABLE_CGO),1)
+ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
 	$(eval linkmode=-linkmode 'external')
 endif
 else
@@ -266,7 +266,7 @@ ifeq ($(_RULES_MK_FORCE_DEP_REBUILD),1)
 else
 	@echo -e " - build cache      : $(green)enabled$(reset)"
 endif
-ifeq ($(_RULES_MK_ENABLE_RACE),1)
+ifeq ($(_RULES_MK_FLAG_ENABLE_RACE),1)
 	@echo -e " - race detector    : $(green)enabled$(reset)"
 	$(eval race=-race)
 else
@@ -281,7 +281,7 @@ endif
 			GOOS=$(shell echo $(@) | cut -d "/" -f 1) \
 			GOARCH=$(shell echo $(@) | cut -d "/" -f 2) \
 			GOAMD64=$(GOAMD64) \
-			CGO_ENABLED=$(_RULES_MK_ENABLE_CGO); \
+			CGO_ENABLED=$(_RULES_MK_FLAG_ENABLE_CGO); \
 			go build -v \
 			$(cvsflags) \
 			$(race) \
