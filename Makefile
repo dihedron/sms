@@ -11,7 +11,7 @@ MAINTAINER=dihedron.dev@gmail.com
 VENDOR=dihedron.dev@gmail.com
 PRODUCER_URL=https://github.com/dihedron/
 DOWNLOAD_URL=$(PRODUCER_URL)snoop
-METADATA_PACKAGE=$$(grep "module .*" go.mod | sed 's/module //gi')/version
+_RULES_MK_VARS_METADATA_PACKAGE=$$(grep "module .*" go.mod | sed 's/module //gi')/version
 #_RULES_MK_VARS_DOTENV_VAR_NAME=
 
 _RULES_MK_MINIMUM_VERSION=202502220945

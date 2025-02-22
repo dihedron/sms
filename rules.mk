@@ -30,7 +30,7 @@ MAINTAINER ?= <your-email>@gmail.com
 VENDOR ?= <your-email>@gmail.com
 PRODUCER_URL ?= https://github.com/<your-github-username>/
 DOWNLOAD_URL ?= $(PRODUCER_URL)my-app
-METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/version
+_RULES_MK_VARS_METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/version
 _RULES_MK_VARS_DOTENV_VAR_NAME ?= $$(echo $(_RULES_MK_VARS_NAME) | tr '[:lower:]' '[:upper:]' | tr '-' '_')_DOTENV
 
 #
@@ -135,10 +135,10 @@ SHELL := /bin/bash
 
 platforms="$$(go tool dist list)"
 module := $$(grep "module .*" go.mod | sed 's/module //gi')
-ifeq ($(METADATA_PACKAGE),)
+ifeq ($(_RULES_MK_VARS_METADATA_PACKAGE),)
 	package := $(module)/commands/version
 else
-	package := $(METADATA_PACKAGE)
+	package := $(_RULES_MK_VARS_METADATA_PACKAGE)
 endif
 
 now := $$(date --rfc-3339=seconds)
@@ -202,7 +202,7 @@ show-build-vars: ## show actual build variables values
 	@echo -e " - VENDOR           : $(green)$(VENDOR)$(reset)"
 	@echo -e " - PRODUCER_URL     : $(green)$(PRODUCER_URL)$(reset)"
 	@echo -e " - DOWNLOAD_URL     : $(green)$(DOWNLOAD_URL)$(reset)"
-	@echo -e " - METADATA_PACKAGE : $(green)$(METADATA_PACKAGE)$(reset)"
+	@echo -e " - _RULES_MK_VARS_METADATA_PACKAGE : $(green)$(_RULES_MK_VARS_METADATA_PACKAGE)$(reset)"
 	@echo -e " - _RULES_MK_VARS_DOTENV_VAR_NAME       : $(green)$(_RULES_MK_VARS_DOTENV_VAR_NAME)$(reset)"
 
 %: ## replace % with one or more <goos>/<goarch> combinations, e.g. linux/amd64, to build it
