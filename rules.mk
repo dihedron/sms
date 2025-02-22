@@ -2,22 +2,22 @@
 # This value is updated each time a new feature is added
 # to the rules.mk targets and build rules file.
 #
-_RULES_MK_CURRENT_VERSION := 202502220945
-ifeq ($(_RULES_MK_MINIMUM_VERSION),)
-	_RULES_MK_MINIMUM_VERSION := 0
+_RULES_MK_FLAG_CURRENT_VERSION := 202502220945
+ifeq ($(_RULES_MK_FLAG_MINIMUM_VERSION),)
+	_RULES_MK_FLAG_MINIMUM_VERSION := 0
 endif
 
 #
 # test if minimum rules.mk version requirement is met
 #
-ifneq ($(shell test $(_RULES_MK_CURRENT_VERSION) -ge $(_RULES_MK_MINIMUM_VERSION); echo $$?),0)
-	@echo "minimum rules.mk version requirement not met (expected at least $(_RULES_MK_MINIMUM_VERSION), got $(_RULES_MK_CURRENT_VERSION))" && exit 1
+ifneq ($(shell test $(_RULES_MK_FLAG_CURRENT_VERSION) -ge $(_RULES_MK_FLAG_MINIMUM_VERSION); echo $$?),0)
+	@echo "minimum rules.mk version requirement not met (expected at least $(_RULES_MK_FLAG_MINIMUM_VERSION), got $(_RULES_MK_FLAG_CURRENT_VERSION))" && exit 1
 endif
 
 #
 # default application metadata
 #
-NAME ?= my-app
+_RULES_MK_VARS_NAME ?= my-app
 DESCRIPTION ?= <Provide your description here>
 COPYRIGHT ?= <20XX> © <your name>
 LICENSE ?= MIT
@@ -31,7 +31,7 @@ VENDOR ?= <your-email>@gmail.com
 PRODUCER_URL ?= https://github.com/<your-github-username>/
 DOWNLOAD_URL ?= $(PRODUCER_URL)my-app
 METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/version
-ENV_PREFIX ?= $$(echo $(NAME) | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+_RULES_MK_VARS_DOTENV_VAR_NAME ?= $$(echo $(_RULES_MK_VARS_NAME) | tr '[:lower:]' '[:upper:]' | tr '-' '_')_DOTENV
 
 #
 # default feature flag values
@@ -46,14 +46,7 @@ _RULES_MK_STRIP_SYMBOLS ?= 0
 _RULES_MK_STRIP_DBG_INFO =? 0
 _RULES_MK_FORCE_DEP_REBUILD ?= 0
 
-#
-# This value is updated each time a new feature is added
-# to the rules.mk targets and build rules file.
-#
-_RULES_MK_CURRENT_VERSION := 202412050855
-ifeq ($(_RULES_MK_MINIMUM_VERSION),)
-	_RULES_MK_MINIMUM_VERSION := 0
-endif
+
 
 #
 # In order to enable race detector, the _RULES_MK_ENABLE_RACE
@@ -196,7 +189,7 @@ release: quality compile deb rpm apk
 .PHONY: show-build-vars
 show-build-vars: ## show actual build variables values
 	@echo -e "Build Variables:"
-	@echo -e " - NAME             : $(green)$(NAME)$(reset)"
+	@echo -e " - _RULES_MK_VARS_NAME             : $(green)$(_RULES_MK_VARS_NAME)$(reset)"
 	@echo -e " - DESCRIPTION      : $(green)$(DESCRIPTION)$(reset)"
 	@echo -e " - COPYRIGHT        : $(green)$(COPYRIGHT)$(reset)"
 	@echo -e " - LICENSE          : $(green)$(LICENSE)$(reset)"
@@ -210,10 +203,7 @@ show-build-vars: ## show actual build variables values
 	@echo -e " - PRODUCER_URL     : $(green)$(PRODUCER_URL)$(reset)"
 	@echo -e " - DOWNLOAD_URL     : $(green)$(DOWNLOAD_URL)$(reset)"
 	@echo -e " - METADATA_PACKAGE : $(green)$(METADATA_PACKAGE)$(reset)"
-	@echo -e " - ENV_PREFIX       : $(green)$(ENV_PREFIX)$(reset)"
-
-
-
+	@echo -e " - _RULES_MK_VARS_DOTENV_VAR_NAME       : $(green)$(_RULES_MK_VARS_DOTENV_VAR_NAME)$(reset)"
 
 %: ## replace % with one or more <goos>/<goarch> combinations, e.g. linux/amd64, to build it
 	@[ -t 1 ] && piped=0 || piped=1 ; echo "piped=$${piped}" > .piped
@@ -303,7 +293,7 @@ endif
 			$(strip_symbols) \
 			$(linkmode) \
 			$(static) \
-			-X '$(package).Name=$(NAME)' \
+			-X '$(package).Name=$(_RULES_MK_VARS_NAME)' \
 			-X '$(package).Description=$(DESCRIPTION)' \
 			-X '$(package).Copyright=$(COPYRIGHT)' \
 			-X '$(package).License=$(LICENSE)' \
@@ -311,7 +301,8 @@ endif
 			-X '$(package).BuildTime=$(now)' \
 			-X '$(package).VersionMajor=$(VERSION_MAJOR)' \
 			-X '$(package).VersionMinor=$(VERSION_MINOR)' \
-			-X '$(package).VersionPatch=$(VERSION_PATCH)'" \
+			-X '$(package).VersionPatch=$(VERSION_PATCH)' \
+			-X '$(package).DotEnvVarName=$(_RULES_MK_VARS_DOTENV_VAR_NAME)'" \
 			-o dist/$(@)/ . && echo -e "RESULT: $(green)OK$(reset)" || echo -e "RESULT: $(red)KO$(reset)";\
 		fi; \
 	done
@@ -351,7 +342,7 @@ ifeq (, $(shell which upx))
 	@echo -e "Need to $(green)install UPX$(reset) first..."
 	@sudo apt install upx
 endif
-	@for binary in `find dist/ -type f -regex '.*$(NAME)[\.exe]*'`; do \
+	@for binary in `find dist/ -type f -regex '.*$(_RULES_MK_VARS_NAME)[\.exe]*'`; do \
 		upx -9 $$binary; \
 	done;
 	@rm -f .piped
@@ -363,7 +354,7 @@ ifeq (, $(shell which upx))
 	@echo-e  "Need to $(green)install UPX$(reset) first..."
 	@sudo apt install upx
 endif
-	@for binary in `find dist/ -type f -regex '.*$(NAME)[\.exe]*'`; do \
+	@for binary in `find dist/ -type f -regex '.*$(_RULES_MK_VARS_NAME)[\.exe]*'`; do \
 		upx --brute $$binary; \
 	done;
 	@rm -f .piped
@@ -391,9 +382,9 @@ endif
 ifeq ($(PLATFORM),)
 	$(eval PLATFORM=linux/amd64)
 endif
-	@echo -e "Installing $(green)$(PLATFORM)/$(NAME)$(reset) to $(PREFIX)/$(NAME)..."
-	@cp dist/$(PLATFORM)/$(NAME) $(PREFIX)
-	@chmod 755 $(PREFIX)/$(NAME)
+	@echo -e "Installing $(green)$(PLATFORM)/$(_RULES_MK_VARS_NAME)$(reset) to $(PREFIX)/$(_RULES_MK_VARS_NAME)..."
+	@cp dist/$(PLATFORM)/$(_RULES_MK_VARS_NAME) $(PREFIX)
+	@chmod 755 $(PREFIX)/$(_RULES_MK_VARS_NAME)
 endif
 	@rm -f .piped
 
@@ -409,8 +400,8 @@ endif
 ifeq ($(PREFIX),)
 	$(eval PREFIX="/usr/local/bin")
 endif
-	@echo "Uninstalling $(PREFIX)/$(NAME)..."
-	@rm -rf $(PREFIX)/$(NAME)
+	@echo "Uninstalling $(PREFIX)/$(_RULES_MK_VARS_NAME)..."
+	@rm -rf $(PREFIX)/$(_RULES_MK_VARS_NAME)
 endif
 	@rm -f .piped
 
@@ -426,13 +417,13 @@ ifeq ($(PLATFORM),)
 endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
-	@echo -e "Creating $(green)DEB$(reset) package for $(green)$(NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
-	@NAME=$(NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager deb --target dist/$(PLATFORM)/
+	@echo -e "Creating $(green)DEB$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
+	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager deb --target dist/$(PLATFORM)/
 	@rm -f .piped
 # @echo -e "PLATFORM: $(PLATFORM)"
 # @echo -e "GOOS: $(GOOS)"
 # @echo -e "GOARCH: $(GOARCH)"
-# @echo -e "NAME: $(NAME)"
+# @echo -e "_RULES_MK_VARS_NAME: $(_RULES_MK_VARS_NAME)"
 # @echo -e "VERSION: $(VERSION)"
 
 .PHONY: rpm
@@ -447,8 +438,8 @@ ifeq ($(PLATFORM),)
 endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
-	@echo -e "Creating $(green)RPM$(reset) package for $(green)$(NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
-	@NAME=$(NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager rpm --target dist/$(PLATFORM)/
+	@echo -e "Creating $(green)RPM$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
+	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager rpm --target dist/$(PLATFORM)/
 	@rm -f .piped
 
 .PHONY: apk
@@ -463,8 +454,8 @@ ifeq ($(PLATFORM),)
 endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
-	@echo -e "Creating $(green)APK$(reset) package for $(green)$(NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
-	@NAME=$(NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager apk --target dist/$(PLATFORM)/
+	@echo -e "Creating $(green)APK$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
+	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager apk --target dist/$(PLATFORM)/
 	@rm -f .piped
 
 .PHONY: container
@@ -499,7 +490,7 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e "In order to use this Make rules file, simply create a Makefile"
 	@echo -e "in the root of your project, with the following $(red)mandatory$(reset) contents:"
 	@echo
-	@echo -e "NAME := KoolApp $(green)# replace with the name of your executable$(reset) "
+	@echo -e "_RULES_MK_VARS_NAME := KoolApp $(green)# replace with the name of your executable$(reset) "
 	@echo -e "DESCRIPTION := KoolApp provides a cool way to do things. $(green)# replace with a description of your application$(reset) "
 	@echo -e "COPYRIGHT := 2024 © Johanna Doe $(green)# replace with proper year @ your name$(reset) "
 	@echo -e "LICENSE := MIT $(green)# replace with a license to your liking...$(reset) "
@@ -511,7 +502,7 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e "MAINTAINER := johanna.doe@example.com $(green)# replace with the email of the maintainer$(reset) "
 	@echo -e "VENDOR := koolsoft@example.com $(green)# replace with the email of the vendor$(reset) "
 	@echo -e "PRODUCER_URL := https://github.com/koolsoft/ $(green)# replace with the URL of the software producer$(reset)"
-	@echo -e 'DOWNLOAD_URL := $$(PRODUCER_URL)$$(NAME) $(green)# leave it like this unless you need to override$(reset)'
+	@echo -e 'DOWNLOAD_URL := $$(PRODUCER_URL)$$(_RULES_MK_VARS_NAME) $(green)# leave it like this unless you need to override$(reset)'
 	@echo
 	@echo -e "include rules.mk $(green)# this is where the Make rules are imported$(reset)"
 	@echo

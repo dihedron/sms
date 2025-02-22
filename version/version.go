@@ -53,8 +53,8 @@ var (
 	VersionMinor = "0"
 	// VersionPatch is the patch or revision level of the application.
 	VersionPatch = "0"
-	// EnvPrefix is the prefix used for environment variables lookup.
-	EnvPrefix = ""
+	// DotEnvVarName is the name of the environment variable holding the name of the .env file for environment variables lookup.
+	DotEnvVarName string
 )
 
 func init() {
@@ -103,4 +103,5 @@ func Print(writer io.Writer) {
 	// fmt.Printf("  - Architecture     : %s\n", GoArch)
 	// fmt.Printf("  - Git Time         : %s\n", GitTime)
 	// fmt.Printf("  - Build Commit     : %s\n", GitCommit)
+	fmt.Printf("  - Environment Variable Name: %s\n", DotEnvVarName)
 }

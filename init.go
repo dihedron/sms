@@ -8,14 +8,19 @@ import (
 	"path"
 	"strings"
 
+	"github.com/dihedron/sms/version"
 	"github.com/joho/godotenv"
 )
 
 func init() {
 
-	err := godotenv.Load()
-	if err != nil {
-		slog.Error("error loading .env file", "error", err)
+	fmt.Printf("checking env var %s\n", version.DotEnvVarName)
+	dotenv, ok := os.LookupEnv(version.DotEnvVarName)
+	if ok {
+		err := godotenv.Load(dotenv)
+		if err != nil {
+			slog.Error("error loading .env file", "error", err)
+		}
 	}
 
 	const LevelNone = slog.Level(1000)
