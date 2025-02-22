@@ -57,6 +57,8 @@ var (
 	Vendor string
 	// Maintainer is the name of the person or organization responsible for maintaining the application.
 	Maintainer string
+	// RulesMkVersion is the version of the rules.mk file used in the build process.
+	RulesMkVersion string
 	// DotEnvVarName is the name of the environment variable holding the name of the .env file for environment variables lookup.
 	DotEnvVarName string
 )
@@ -107,6 +109,7 @@ func Print(writer io.Writer) {
 	fmt.Printf("  - Vendor           : %s\n", Vendor)
 	fmt.Printf("  - Maintainer       : %s\n", Maintainer)
 	fmt.Printf("  - Built on         : %s\n", BuildTime)
+	fmt.Printf("  - Rules.mk Version : %s\n", RulesMkVersion)
 	fmt.Printf("  - Compiler         : %s\n", GoVersion)
 	fmt.Printf("  - Operating System : %s\n", GoOS)
 	fmt.Printf("  - Architecture     : %s\n", GoArch)

@@ -2,16 +2,16 @@
 # This value is updated each time a new feature is added
 # to the rules.mk targets and build rules file.
 #
-_RULES_MK_FLAG_CURRENT_VERSION := 202502220945
-ifeq ($(_RULES_MK_FLAG_MINIMUM_VERSION),)
-	_RULES_MK_FLAG_MINIMUM_VERSION := 0
+_RULES_MK_CURRENT_VERSION := 202502221935
+ifeq ($(_RULES_MK_MINIMUM_VERSION),)
+	_RULES_MK_MINIMUM_VERSION := 0
 endif
 
 #
 # test if minimum rules.mk version requirement is met
 #
-ifneq ($(shell test $(_RULES_MK_FLAG_CURRENT_VERSION) -ge $(_RULES_MK_FLAG_MINIMUM_VERSION); echo $$?),0)
-	@echo "minimum rules.mk version requirement not met (expected at least $(_RULES_MK_FLAG_MINIMUM_VERSION), got $(_RULES_MK_FLAG_CURRENT_VERSION))" && exit 1
+ifneq ($(shell test $(_RULES_MK_CURRENT_VERSION) -ge $(_RULES_MK_MINIMUM_VERSION); echo $$?),0)
+	@echo "minimum rules.mk version requirement not met (expected at least $(_RULES_MK_MINIMUM_VERSION), got $(_RULES_MK_CURRENT_VERSION))" && exit 1
 endif
 
 #
@@ -302,6 +302,7 @@ endif
 			-X '$(package).VersionPatch=$(_RULES_MK_VARS_VERSION_PATCH)' \
 			-X '$(package).Vendor=$(_RULES_MK_VARS_VENDOR)' \
 			-X '$(package).Maintainer=$(_RULES_MK_VARS_MAINTAINER)' \
+			-X '$(package).RulesMkVersion=$(_RULES_MK_CURRENT_VERSION)' \
 			-X '$(package).DotEnvVarName=$(_RULES_MK_VARS_DOTENV_VAR_NAME)'" \
 			-o dist/$(@)/ . && echo -e "RESULT: $(green)OK$(reset)" || echo -e "RESULT: $(red)KO$(reset)";\
 		fi; \
