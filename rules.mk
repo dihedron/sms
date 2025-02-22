@@ -26,7 +26,7 @@ _RULES_MK_VARS_VERSION_MAJOR ?= 0
 _RULES_MK_VARS_VERSION_MINOR ?= 0
 _RULES_MK_VARS_VERSION_PATCH ?= 1
 _RULES_MK_VARS_VERSION ?= $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSION_MINOR).$(_RULES_MK_VARS_VERSION_PATCH)
-MAINTAINER ?= <your-email>@gmail.com
+_RULES_MK_VARS_MAINTAINER ?= <your-email>@gmail.com
 VENDOR ?= <your-email>@gmail.com
 PRODUCER_URL ?= https://github.com/<your-github-username>/
 DOWNLOAD_URL ?= $(PRODUCER_URL)my-app
@@ -198,7 +198,7 @@ show-build-vars: ## show actual build variables values
 	@echo -e " - _RULES_MK_VARS_VERSION_MINOR    : $(green)$(_RULES_MK_VARS_VERSION_MINOR)$(reset)"
 	@echo -e " - _RULES_MK_VARS_VERSION_PATCH    : $(green)$(_RULES_MK_VARS_VERSION_PATCH)$(reset)"
 	@echo -e " - _RULES_MK_VARS_VERSION          : $(green)$(_RULES_MK_VARS_VERSION)$(reset)"
-	@echo -e " - MAINTAINER       : $(green)$(MAINTAINER)$(reset)"
+	@echo -e " - _RULES_MK_VARS_MAINTAINER       : $(green)$(_RULES_MK_VARS_MAINTAINER)$(reset)"
 	@echo -e " - VENDOR           : $(green)$(VENDOR)$(reset)"
 	@echo -e " - PRODUCER_URL     : $(green)$(PRODUCER_URL)$(reset)"
 	@echo -e " - DOWNLOAD_URL     : $(green)$(DOWNLOAD_URL)$(reset)"
@@ -499,7 +499,7 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e "_RULES_MK_VARS_VERSION_MINOR := 0 $(green)# replace with the minor version$(reset) "
 	@echo -e "_RULES_MK_VARS_VERSION_PATCH := 2 $(green)# replace with the patch or revision$(reset)"
 	@echo -e '_RULES_MK_VARS_VERSION := $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSION_MINOR).$(_RULES_MK_VARS_VERSION_PATCH) $(green)# leave it like this unless you need to override$(reset) '
-	@echo -e "MAINTAINER := johanna.doe@example.com $(green)# replace with the email of the maintainer$(reset) "
+	@echo -e "_RULES_MK_VARS_MAINTAINER := johanna.doe@example.com $(green)# replace with the email of the maintainer$(reset) "
 	@echo -e "VENDOR := koolsoft@example.com $(green)# replace with the email of the vendor$(reset) "
 	@echo -e "PRODUCER_URL := https://github.com/koolsoft/ $(green)# replace with the URL of the software producer$(reset)"
 	@echo -e 'DOWNLOAD_URL := $$(PRODUCER_URL)$$(_RULES_MK_VARS_NAME) $(green)# leave it like this unless you need to override$(reset)'
