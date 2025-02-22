@@ -53,6 +53,8 @@ var (
 	VersionMinor = "0"
 	// VersionPatch is the patch or revision level of the application.
 	VersionPatch = "0"
+	// EnvPrefix is the prefix used for environment variables lookup.
+	EnvPrefix = ""
 )
 
 func init() {

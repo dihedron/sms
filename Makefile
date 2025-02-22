@@ -13,7 +13,7 @@ PRODUCER_URL=https://github.com/dihedron/
 DOWNLOAD_URL=$(PRODUCER_URL)snoop
 METADATA_PACKAGE=$$(grep "module .*" go.mod | sed 's/module //gi')/version
 
-_RULES_MK_MINIMUM_VERSION=202412061025
+_RULES_MK_MINIMUM_VERSION=202502220945
 _RULES_MK_ENABLE_CGO=0
 _RULES_MK_ENABLE_GOGEN=1
 _RULES_MK_ENABLE_RACE=0
@@ -28,3 +28,14 @@ include rules.mk
 .PHONY: clean-cache ## remove all cached build entries
 clean-cache:
 	@go clean -x -cache
+
+
+
+MY_STRING := my-example-string-with-dashes
+
+# Convert to uppercase and replace dashes with underscores
+UPPER_UNDERSCORE_STRING := $(shell echo $(MY_STRING) | tr '[:lower:]' '[:upper:]' | tr '-' '_')_
+
+# Print the result
+print-stuff:
+	@echo $(UPPER_UNDERSCORE_STRING)

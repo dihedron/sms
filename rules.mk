@@ -2,7 +2,7 @@
 # This value is updated each time a new feature is added
 # to the rules.mk targets and build rules file.
 #
-_RULES_MK_CURRENT_VERSION := 202412151245
+_RULES_MK_CURRENT_VERSION := 202502220945
 ifeq ($(_RULES_MK_MINIMUM_VERSION),)
 	_RULES_MK_MINIMUM_VERSION := 0
 endif
@@ -31,6 +31,7 @@ VENDOR ?= <your-email>@gmail.com
 PRODUCER_URL ?= https://github.com/<your-github-username>/
 DOWNLOAD_URL ?= $(PRODUCER_URL)my-app
 METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/version
+ENV_PREFIX ?= $$(echo $(NAME) | tr '[:lower:]' '[:upper:]' | tr '-' '_')
 
 #
 # default feature flag values
@@ -190,6 +191,29 @@ compile: linux/amd64 ;
 
 .PHONY: release
 release: quality compile deb rpm apk
+
+
+.PHONY: show-build-vars
+show-build-vars: ## show actual build variables values
+	@echo -e "Build Variables:"
+	@echo -e " - NAME             : $(green)$(NAME)$(reset)"
+	@echo -e " - DESCRIPTION      : $(green)$(DESCRIPTION)$(reset)"
+	@echo -e " - COPYRIGHT        : $(green)$(COPYRIGHT)$(reset)"
+	@echo -e " - LICENSE          : $(green)$(LICENSE)$(reset)"
+	@echo -e " - LICENSE_URL      : $(green)$(LICENSE_URL)$(reset)"
+	@echo -e " - VERSION_MAJOR    : $(green)$(VERSION_MAJOR)$(reset)"
+	@echo -e " - VERSION_MINOR    : $(green)$(VERSION_MINOR)$(reset)"
+	@echo -e " - VERSION_PATCH    : $(green)$(VERSION_PATCH)$(reset)"
+	@echo -e " - VERSION          : $(green)$(VERSION)$(reset)"
+	@echo -e " - MAINTAINER       : $(green)$(MAINTAINER)$(reset)"
+	@echo -e " - VENDOR           : $(green)$(VENDOR)$(reset)"
+	@echo -e " - PRODUCER_URL     : $(green)$(PRODUCER_URL)$(reset)"
+	@echo -e " - DOWNLOAD_URL     : $(green)$(DOWNLOAD_URL)$(reset)"
+	@echo -e " - METADATA_PACKAGE : $(green)$(METADATA_PACKAGE)$(reset)"
+	@echo -e " - ENV_PREFIX       : $(green)$(ENV_PREFIX)$(reset)"
+
+
+
 
 %: ## replace % with one or more <goos>/<goarch> combinations, e.g. linux/amd64, to build it
 	@[ -t 1 ] && piped=0 || piped=1 ; echo "piped=$${piped}" > .piped
