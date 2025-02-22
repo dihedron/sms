@@ -18,7 +18,7 @@ endif
 # default application metadata
 #
 _RULES_MK_VARS_NAME ?= my-app
-DESCRIPTION ?= <Provide your description here>
+_RULES_MK_VARS_DESCRIPTION ?= <Provide your description here>
 COPYRIGHT ?= <20XX> © <your name>
 LICENSE ?= MIT
 LICENSE_URL ?= https://opensource.org/license/mit/
@@ -190,7 +190,7 @@ release: quality compile deb rpm apk
 show-build-vars: ## show actual build variables values
 	@echo -e "Build Variables:"
 	@echo -e " - _RULES_MK_VARS_NAME             : $(green)$(_RULES_MK_VARS_NAME)$(reset)"
-	@echo -e " - DESCRIPTION      : $(green)$(DESCRIPTION)$(reset)"
+	@echo -e " - _RULES_MK_VARS_DESCRIPTION      : $(green)$(_RULES_MK_VARS_DESCRIPTION)$(reset)"
 	@echo -e " - COPYRIGHT        : $(green)$(COPYRIGHT)$(reset)"
 	@echo -e " - LICENSE          : $(green)$(LICENSE)$(reset)"
 	@echo -e " - LICENSE_URL      : $(green)$(LICENSE_URL)$(reset)"
@@ -294,7 +294,7 @@ endif
 			$(linkmode) \
 			$(static) \
 			-X '$(package).Name=$(_RULES_MK_VARS_NAME)' \
-			-X '$(package).Description=$(DESCRIPTION)' \
+			-X '$(package).Description=$(_RULES_MK_VARS_DESCRIPTION)' \
 			-X '$(package).Copyright=$(COPYRIGHT)' \
 			-X '$(package).License=$(LICENSE)' \
 			-X '$(package).LicenseURL=$(LICENSE_URL)' \
@@ -491,7 +491,7 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e "in the root of your project, with the following $(red)mandatory$(reset) contents:"
 	@echo
 	@echo -e "_RULES_MK_VARS_NAME := KoolApp $(green)# replace with the name of your executable$(reset) "
-	@echo -e "DESCRIPTION := KoolApp provides a cool way to do things. $(green)# replace with a description of your application$(reset) "
+	@echo -e "_RULES_MK_VARS_DESCRIPTION := KoolApp provides a cool way to do things. $(green)# replace with a description of your application$(reset) "
 	@echo -e "COPYRIGHT := 2024 © Johanna Doe $(green)# replace with proper year @ your name$(reset) "
 	@echo -e "LICENSE := MIT $(green)# replace with a license to your liking...$(reset) "
 	@echo -e "LICENSE_URL := https://opensource.org/license/mit/ $(green)# ...and set the URL accordingly$(reset) "
