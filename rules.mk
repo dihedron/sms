@@ -20,7 +20,7 @@ endif
 _RULES_MK_VARS_NAME ?= my-app
 _RULES_MK_VARS_DESCRIPTION ?= <Provide your description here>
 _RULES_MK_VARS_COPYRIGHT ?= <20XX> © <your name>
-LICENSE ?= MIT
+_RULES_MK_VARS_LICENSE ?= MIT
 LICENSE_URL ?= https://opensource.org/license/mit/
 VERSION_MAJOR ?= 0
 VERSION_MINOR ?= 0
@@ -192,7 +192,7 @@ show-build-vars: ## show actual build variables values
 	@echo -e " - _RULES_MK_VARS_NAME             : $(green)$(_RULES_MK_VARS_NAME)$(reset)"
 	@echo -e " - _RULES_MK_VARS_DESCRIPTION      : $(green)$(_RULES_MK_VARS_DESCRIPTION)$(reset)"
 	@echo -e " - _RULES_MK_VARS_COPYRIGHT        : $(green)$(_RULES_MK_VARS_COPYRIGHT)$(reset)"
-	@echo -e " - LICENSE          : $(green)$(LICENSE)$(reset)"
+	@echo -e " - _RULES_MK_VARS_LICENSE          : $(green)$(_RULES_MK_VARS_LICENSE)$(reset)"
 	@echo -e " - LICENSE_URL      : $(green)$(LICENSE_URL)$(reset)"
 	@echo -e " - VERSION_MAJOR    : $(green)$(VERSION_MAJOR)$(reset)"
 	@echo -e " - VERSION_MINOR    : $(green)$(VERSION_MINOR)$(reset)"
@@ -296,7 +296,7 @@ endif
 			-X '$(package).Name=$(_RULES_MK_VARS_NAME)' \
 			-X '$(package).Description=$(_RULES_MK_VARS_DESCRIPTION)' \
 			-X '$(package).Copyright=$(_RULES_MK_VARS_COPYRIGHT)' \
-			-X '$(package).License=$(LICENSE)' \
+			-X '$(package).License=$(_RULES_MK_VARS_LICENSE)' \
 			-X '$(package).LicenseURL=$(LICENSE_URL)' \
 			-X '$(package).BuildTime=$(now)' \
 			-X '$(package).VersionMajor=$(VERSION_MAJOR)' \
@@ -493,7 +493,7 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e "_RULES_MK_VARS_NAME := KoolApp $(green)# replace with the name of your executable$(reset) "
 	@echo -e "_RULES_MK_VARS_DESCRIPTION := KoolApp provides a cool way to do things. $(green)# replace with a description of your application$(reset) "
 	@echo -e "_RULES_MK_VARS_COPYRIGHT := 2024 © Johanna Doe $(green)# replace with proper year @ your name$(reset) "
-	@echo -e "LICENSE := MIT $(green)# replace with a license to your liking...$(reset) "
+	@echo -e "_RULES_MK_VARS_LICENSE := MIT $(green)# replace with a license to your liking...$(reset) "
 	@echo -e "LICENSE_URL := https://opensource.org/license/mit/ $(green)# ...and set the URL accordingly$(reset) "
 	@echo -e "VERSION_MAJOR := 1 $(green)# replace with the major version$(reset)"
 	@echo -e "VERSION_MINOR := 0 $(green)# replace with the minor version$(reset) "

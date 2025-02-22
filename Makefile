@@ -1,7 +1,7 @@
 _RULES_MK_VARS_NAME := sms
 _RULES_MK_VARS_DESCRIPTION := Send SMS through RDCom API
 _RULES_MK_VARS_COPYRIGHT := 2025 © Andrea Funtò
-LICENSE := MIT
+_RULES_MK_VARS_LICENSE := MIT
 LICENSE_URL := https://opensource.org/license/mit/
 VERSION_MAJOR := 0
 VERSION_MINOR := 0
