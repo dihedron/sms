@@ -28,8 +28,8 @@ _RULES_MK_VARS_VERSION_PATCH ?= 1
 _RULES_MK_VARS_VERSION ?= $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSION_MINOR).$(_RULES_MK_VARS_VERSION_PATCH)
 _RULES_MK_VARS_MAINTAINER ?= <your-email>@gmail.com
 _RULES_MK_VARS_VENDOR ?= <your-email>@gmail.com
-PRODUCER_URL ?= https://github.com/<your-github-username>/
-DOWNLOAD_URL ?= $(PRODUCER_URL)my-app
+_RULES_MK_VARS_PRODUCER_URL ?= https://github.com/<your-github-username>/
+_RULES_MK_VARS_DOWNLOAD_URL ?= $(_RULES_MK_VARS_PRODUCER_URL)$$(_RULES_MK_VARS_NAME)
 _RULES_MK_VARS_METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/version
 _RULES_MK_VARS_DOTENV_VAR_NAME ?= $$(echo $(_RULES_MK_VARS_NAME) | tr '[:lower:]' '[:upper:]' | tr '-' '_')_DOTENV
 
@@ -45,8 +45,6 @@ _RULES_MK_ENABLE_NETGO ?= 0
 _RULES_MK_STRIP_SYMBOLS ?= 0
 _RULES_MK_STRIP_DBG_INFO =? 0
 _RULES_MK_FORCE_DEP_REBUILD ?= 0
-
-
 
 #
 # In order to enable race detector, the _RULES_MK_ENABLE_RACE
@@ -200,10 +198,10 @@ show-build-vars: ## show actual build variables values
 	@echo -e " - _RULES_MK_VARS_VERSION          : $(green)$(_RULES_MK_VARS_VERSION)$(reset)"
 	@echo -e " - _RULES_MK_VARS_MAINTAINER       : $(green)$(_RULES_MK_VARS_MAINTAINER)$(reset)"
 	@echo -e " - _RULES_MK_VARS_VENDOR           : $(green)$(_RULES_MK_VARS_VENDOR)$(reset)"
-	@echo -e " - PRODUCER_URL     : $(green)$(PRODUCER_URL)$(reset)"
-	@echo -e " - DOWNLOAD_URL     : $(green)$(DOWNLOAD_URL)$(reset)"
+	@echo -e " - _RULES_MK_VARS_PRODUCER_URL     : $(green)$(_RULES_MK_VARS_PRODUCER_URL)$(reset)"
+	@echo -e " - _RULES_MK_VARS_DOWNLOAD_URL     : $(green)$(_RULES_MK_VARS_DOWNLOAD_URL)$(reset)"
 	@echo -e " - _RULES_MK_VARS_METADATA_PACKAGE : $(green)$(_RULES_MK_VARS_METADATA_PACKAGE)$(reset)"
-	@echo -e " - _RULES_MK_VARS_DOTENV_VAR_NAME       : $(green)$(_RULES_MK_VARS_DOTENV_VAR_NAME)$(reset)"
+	@echo -e " - _RULES_MK_VARS_DOTENV_VAR_NAME  : $(green)$(_RULES_MK_VARS_DOTENV_VAR_NAME)$(reset)"
 
 %: ## replace % with one or more <goos>/<goarch> combinations, e.g. linux/amd64, to build it
 	@[ -t 1 ] && piped=0 || piped=1 ; echo "piped=$${piped}" > .piped
@@ -302,6 +300,8 @@ endif
 			-X '$(package).VersionMajor=$(_RULES_MK_VARS_VERSION_MAJOR)' \
 			-X '$(package).VersionMinor=$(_RULES_MK_VARS_VERSION_MINOR)' \
 			-X '$(package).VersionPatch=$(_RULES_MK_VARS_VERSION_PATCH)' \
+			-X '$(package).Vendor=$(_RULES_MK_VARS_VENDOR)' \
+			-X '$(package).Maintainer=$(_RULES_MK_VARS_MAINTAINER)' \
 			-X '$(package).DotEnvVarName=$(_RULES_MK_VARS_DOTENV_VAR_NAME)'" \
 			-o dist/$(@)/ . && echo -e "RESULT: $(green)OK$(reset)" || echo -e "RESULT: $(red)KO$(reset)";\
 		fi; \
@@ -501,8 +501,8 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e '_RULES_MK_VARS_VERSION := $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSION_MINOR).$(_RULES_MK_VARS_VERSION_PATCH) $(green)# leave it like this unless you need to override$(reset) '
 	@echo -e "_RULES_MK_VARS_MAINTAINER := johanna.doe@example.com $(green)# replace with the email of the maintainer$(reset) "
 	@echo -e "_RULES_MK_VARS_VENDOR := koolsoft@example.com $(green)# replace with the email of the vendor$(reset) "
-	@echo -e "PRODUCER_URL := https://github.com/koolsoft/ $(green)# replace with the URL of the software producer$(reset)"
-	@echo -e 'DOWNLOAD_URL := $$(PRODUCER_URL)$$(_RULES_MK_VARS_NAME) $(green)# leave it like this unless you need to override$(reset)'
+	@echo -e "_RULES_MK_VARS_PRODUCER_URL := https://github.com/koolsoft/ $(green)# replace with the URL of the software producer$(reset)"
+	@echo -e "_RULES_MK_VARS_DOWNLOAD_URL := $(_RULES_MK_VARS_PRODUCER_URL)$$(_RULES_MK_VARS_NAME) $(green)# leave it like this unless you need to override$(reset)"
 	@echo
 	@echo -e "include rules.mk $(green)# this is where the Make rules are imported$(reset)"
 	@echo

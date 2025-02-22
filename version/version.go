@@ -53,6 +53,10 @@ var (
 	VersionMinor = "0"
 	// VersionPatch is the patch or revision level of the application.
 	VersionPatch = "0"
+	// Vendor is the name of the vendor or organization responsible for the application.
+	Vendor string
+	// Maintainer is the name of the person or organization responsible for maintaining the application.
+	Maintainer string
 	// DotEnvVarName is the name of the environment variable holding the name of the .env file for environment variables lookup.
 	DotEnvVarName string
 )
@@ -91,17 +95,22 @@ func Print(writer io.Writer) {
 		GoArch,
 		Copyright,
 		Description)
-	// fmt.Printf("  - Name             : %s\n", Name)
-	// fmt.Printf("  - Description      : %s\n", Description)
-	// fmt.Printf("  - Copyright        : %s\n", Copyright)
-	// fmt.Printf("  - Major Version    : %s\n", VersionMajor)
-	// fmt.Printf("  - Minor Version    : %s\n", VersionMinor)
-	// fmt.Printf("  - Patch Version    : %s\n", VersionPatch)
-	// fmt.Printf("  - Built on         : %s\n", BuildTime)
-	// fmt.Printf("  - Compiler         : %s\n", GoVersion)
-	// fmt.Printf("  - Operating System : %s\n", GoOS)
-	// fmt.Printf("  - Architecture     : %s\n", GoArch)
-	// fmt.Printf("  - Git Time         : %s\n", GitTime)
-	// fmt.Printf("  - Build Commit     : %s\n", GitCommit)
+	fmt.Println("-------------------------------------")
+	fmt.Printf("  - Name             : %s\n", Name)
+	fmt.Printf("  - Description      : %s\n", Description)
+	fmt.Printf("  - Copyright        : %s\n", Copyright)
+	fmt.Printf("  - License          : %s\n", License)
+	fmt.Printf("  - License URL      : %s\n", LicenseURL)
+	fmt.Printf("  - Major Version    : %s\n", VersionMajor)
+	fmt.Printf("  - Minor Version    : %s\n", VersionMinor)
+	fmt.Printf("  - Patch Version    : %s\n", VersionPatch)
+	fmt.Printf("  - Vendor           : %s\n", Vendor)
+	fmt.Printf("  - Maintainer       : %s\n", Maintainer)
+	fmt.Printf("  - Built on         : %s\n", BuildTime)
+	fmt.Printf("  - Compiler         : %s\n", GoVersion)
+	fmt.Printf("  - Operating System : %s\n", GoOS)
+	fmt.Printf("  - Architecture     : %s\n", GoArch)
+	fmt.Printf("  - Git Time         : %s\n", GitTime)
+	fmt.Printf("  - Build Commit     : %s\n", GitCommit)
 	fmt.Printf("  - Environment Variable Name: %s\n", DotEnvVarName)
 }
