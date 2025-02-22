@@ -22,10 +22,10 @@ _RULES_MK_VARS_DESCRIPTION ?= <Provide your description here>
 _RULES_MK_VARS_COPYRIGHT ?= <20XX> © <your name>
 _RULES_MK_VARS_LICENSE ?= MIT
 _RULES_MK_VARS_LICENSE_URL ?= https://opensource.org/license/mit/
-VERSION_MAJOR ?= 0
-VERSION_MINOR ?= 0
-VERSION_PATCH ?= 1
-VERSION ?= $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
+_RULES_MK_VARS_VERSION_MAJOR ?= 0
+_RULES_MK_VARS_VERSION_MINOR ?= 0
+_RULES_MK_VARS_VERSION_PATCH ?= 1
+_RULES_MK_VARS_VERSION ?= $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSION_MINOR).$(_RULES_MK_VARS_VERSION_PATCH)
 MAINTAINER ?= <your-email>@gmail.com
 VENDOR ?= <your-email>@gmail.com
 PRODUCER_URL ?= https://github.com/<your-github-username>/
@@ -194,10 +194,10 @@ show-build-vars: ## show actual build variables values
 	@echo -e " - _RULES_MK_VARS_COPYRIGHT        : $(green)$(_RULES_MK_VARS_COPYRIGHT)$(reset)"
 	@echo -e " - _RULES_MK_VARS_LICENSE          : $(green)$(_RULES_MK_VARS_LICENSE)$(reset)"
 	@echo -e " - _RULES_MK_VARS_LICENSE_URL      : $(green)$(_RULES_MK_VARS_LICENSE_URL)$(reset)"
-	@echo -e " - VERSION_MAJOR    : $(green)$(VERSION_MAJOR)$(reset)"
-	@echo -e " - VERSION_MINOR    : $(green)$(VERSION_MINOR)$(reset)"
-	@echo -e " - VERSION_PATCH    : $(green)$(VERSION_PATCH)$(reset)"
-	@echo -e " - VERSION          : $(green)$(VERSION)$(reset)"
+	@echo -e " - _RULES_MK_VARS_VERSION_MAJOR    : $(green)$(_RULES_MK_VARS_VERSION_MAJOR)$(reset)"
+	@echo -e " - _RULES_MK_VARS_VERSION_MINOR    : $(green)$(_RULES_MK_VARS_VERSION_MINOR)$(reset)"
+	@echo -e " - _RULES_MK_VARS_VERSION_PATCH    : $(green)$(_RULES_MK_VARS_VERSION_PATCH)$(reset)"
+	@echo -e " - _RULES_MK_VARS_VERSION          : $(green)$(_RULES_MK_VARS_VERSION)$(reset)"
 	@echo -e " - MAINTAINER       : $(green)$(MAINTAINER)$(reset)"
 	@echo -e " - VENDOR           : $(green)$(VENDOR)$(reset)"
 	@echo -e " - PRODUCER_URL     : $(green)$(PRODUCER_URL)$(reset)"
@@ -299,9 +299,9 @@ endif
 			-X '$(package).License=$(_RULES_MK_VARS_LICENSE)' \
 			-X '$(package).LicenseURL=$(_RULES_MK_VARS_LICENSE_URL)' \
 			-X '$(package).BuildTime=$(now)' \
-			-X '$(package).VersionMajor=$(VERSION_MAJOR)' \
-			-X '$(package).VersionMinor=$(VERSION_MINOR)' \
-			-X '$(package).VersionPatch=$(VERSION_PATCH)' \
+			-X '$(package).VersionMajor=$(_RULES_MK_VARS_VERSION_MAJOR)' \
+			-X '$(package).VersionMinor=$(_RULES_MK_VARS_VERSION_MINOR)' \
+			-X '$(package).VersionPatch=$(_RULES_MK_VARS_VERSION_PATCH)' \
 			-X '$(package).DotEnvVarName=$(_RULES_MK_VARS_DOTENV_VAR_NAME)'" \
 			-o dist/$(@)/ . && echo -e "RESULT: $(green)OK$(reset)" || echo -e "RESULT: $(red)KO$(reset)";\
 		fi; \
@@ -495,10 +495,10 @@ howto: ## show how to use this Makefile in your Golang project
 	@echo -e "_RULES_MK_VARS_COPYRIGHT := 2024 © Johanna Doe $(green)# replace with proper year @ your name$(reset) "
 	@echo -e "_RULES_MK_VARS_LICENSE := MIT $(green)# replace with a license to your liking...$(reset) "
 	@echo -e "_RULES_MK_VARS_LICENSE_URL := https://opensource.org/license/mit/ $(green)# ...and set the URL accordingly$(reset) "
-	@echo -e "VERSION_MAJOR := 1 $(green)# replace with the major version$(reset)"
-	@echo -e "VERSION_MINOR := 0 $(green)# replace with the minor version$(reset) "
-	@echo -e "VERSION_PATCH := 2 $(green)# replace with the patch or revision$(reset)"
-	@echo -e 'VERSION := $$(VERSION_MAJOR).$$(VERSION_MINOR).$$(VERSION_PATCH) $(green)# leave it like this unless you need to override$(reset) '
+	@echo -e "_RULES_MK_VARS_VERSION_MAJOR := 1 $(green)# replace with the major version$(reset)"
+	@echo -e "_RULES_MK_VARS_VERSION_MINOR := 0 $(green)# replace with the minor version$(reset) "
+	@echo -e "_RULES_MK_VARS_VERSION_PATCH := 2 $(green)# replace with the patch or revision$(reset)"
+	@echo -e '_RULES_MK_VARS_VERSION := $(_RULES_MK_VARS_VERSION_MAJOR).$(_RULES_MK_VARS_VERSION_MINOR).$(_RULES_MK_VARS_VERSION_PATCH) $(green)# leave it like this unless you need to override$(reset) '
 	@echo -e "MAINTAINER := johanna.doe@example.com $(green)# replace with the email of the maintainer$(reset) "
 	@echo -e "VENDOR := koolsoft@example.com $(green)# replace with the email of the vendor$(reset) "
 	@echo -e "PRODUCER_URL := https://github.com/koolsoft/ $(green)# replace with the URL of the software producer$(reset)"
