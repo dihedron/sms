@@ -13,12 +13,9 @@ import (
 )
 
 func init() {
-
-	fmt.Printf("checking env var %s\n", version.DotEnvVarName)
-	dotenv, ok := os.LookupEnv(version.DotEnvVarName)
-	if ok {
-		err := godotenv.Load(dotenv)
-		if err != nil {
+	slog.Debug("checking .env environment variable", "name", version.DotEnvVarName)
+	if dotenv, ok := os.LookupEnv(version.DotEnvVarName); ok {
+		if err := godotenv.Load(dotenv); err != nil {
 			slog.Error("error loading .env file", "error", err)
 		}
 	}

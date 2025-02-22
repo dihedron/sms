@@ -40,11 +40,11 @@ _RULES_MK_TIDY_DEPS ?= 1
 _RULES_MK_FLAG_ENABLE_CGO ?= 1
 _RULES_MK_FLAG_ENABLE_GOGEN ?= 1
 _RULES_MK_FLAG_ENABLE_RACE ?= 1
-_RULES_MK_STATIC_LINK ?= 0
-_RULES_MK_ENABLE_NETGO ?= 0
-_RULES_MK_STRIP_SYMBOLS ?= 0
-_RULES_MK_STRIP_DBG_INFO =? 0
-_RULES_MK_FORCE_DEP_REBUILD ?= 0
+_RULES_MK_FLAG_STATIC_LINK ?= 0
+_RULES_MK_FLAG_ENABLE_NETGO ?= 0
+_RULES_MK_FLAG_STRIP_SYMBOLS ?= 0
+_RULES_MK_FLAG_STRIP_DBG_INFO ?= 0
+_RULES_MK_FLAG_FORCE_DEP_REBUILD ?= 0
 
 #
 # In order to enable race detector, the _RULES_MK_FLAG_ENABLE_RACE
@@ -80,8 +80,8 @@ endif
 # value to 1; any other value will produce dynamically linked
 # binaries.
 #
-ifneq ($(_RULES_MK_STATIC_LINK),1)
-	_RULES_MK_USE_STATIC_LINK := 0
+ifneq ($(_RULES_MK_FLAG_STATIC_LINK),1)
+	_RULES_MK_FLAG_STATIC_LINK := 0
 endif
 
 #
@@ -90,8 +90,8 @@ endif
 # value uses the native platform's network stack implementation (and
 # requires linking against system C libraries).
 #
-ifneq ($(_RULES_MK_ENABLE_NETGO),1)
-	_RULES_MK_ENABLE_NETGO := 0
+ifneq ($(_RULES_MK_FLAG_ENABLE_NETGO),1)
+	_RULES_MK_FLAG_ENABLE_NETGO := 0
 endif
 
 #
@@ -99,8 +99,8 @@ endif
 # stripping all the symbols. You will not be able to run go tool nm
 # against the binary.
 #
-ifneq ($(_RULES_MK_STRIP_SYMBOLS),1)
-	_RULES_MK_STRIP_SYMBOLS := 0
+ifneq ($(_RULES_MK_FLAG_STRIP_SYMBOLS),1)
+	_RULES_MK_FLAG_STRIP_SYMBOLS := 0
 endif
 
 #
@@ -108,8 +108,8 @@ endif
 # stripping all the GDB debug information; you will not be able to
 # debug the resulting application.
 #
-ifneq ($(_RULES_MK_STRIP_DBG_INFO),1)
-	_RULES_MK_STRIP_DBG_INFO := 0
+ifneq ($(_RULES_MK_FLAG_STRIP_DBG_INFO),1)
+	_RULES_MK_FLAG_STRIP_DBG_INFO := 0
 endif
 
 #
@@ -227,31 +227,27 @@ ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
 else
 	@echo -e " - CGO dependencies : $(yellow)disabled$(reset)"
 endif
-ifeq ($(_RULES_MK_ENABLE_NETGO),1)
+ifeq ($(_RULES_MK_FLAG_ENABLE_NETGO),1)
 	@echo -e " - network stack    : $(green)pure go$(reset)"
 else
 	@echo -e " - network stack    : $(yellow)native$(reset)"
 endif
-ifeq ($(_RULES_MK_STRIP_SYMBOLS),1)
+ifeq ($(_RULES_MK_FLAG_STRIP_SYMBOLS),1)
 	@echo -e " - strip symbols    : $(yellow)yes$(reset)"
 	$(eval strip_symbols=-s)
 else
 	@echo -e " - strip symbols    : $(green)no$(reset)"
 endif
-ifeq ($(_RULES_MK_STRIP_DBG_INFO),1)
+ifeq ($(_RULES_MK_FLAG_STRIP_DBG_INFO),1)
 	@echo -e " - strip debug info : $(yellow)yes$(reset)"
 	$(eval strip_dbg_info=-w)
 else
 	@echo -e " - strip debug info : $(green)no$(reset)"
 endif
-ifeq ($(_RULES_MK_STRIP_SYMBOLS),1)
-	@echo -e " - linking          : $(green)static$(reset)"
-	$(eval strip_symbols=-s)
-endif
 ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
 	$(eval linkmode=-linkmode 'external')
 endif
-ifeq ($(_RULES_MK_STATIC_LINK),1)
+ifeq ($(_RULES_MK_FLAG_STATIC_LINK),1)
 	@echo -e " - linking          : $(green)static$(reset)"
 	$(eval static=-extldflags '-static')
 ifeq ($(_RULES_MK_FLAG_ENABLE_CGO),1)
@@ -260,7 +256,7 @@ endif
 else
 	@echo -e " - linking          : $(yellow)dynamic$(reset)"
 endif
-ifeq ($(_RULES_MK_FORCE_DEP_REBUILD),1)
+ifeq ($(_RULES_MK_FLAG_FORCE_DEP_REBUILD),1)
 	@echo -e " - build cache      : $(yellow)disabled$(reset)"
 	$(eval recompile=-a)
 else
