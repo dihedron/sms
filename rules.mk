@@ -36,7 +36,7 @@ _RULES_MK_VARS_DOTENV_VAR_NAME ?= $$(echo $(_RULES_MK_VARS_NAME) | tr '[:lower:]
 #
 # default feature flag values
 #
-_RULES_MK_TIDY_DEPS ?= 1
+_RULES_MK_FLAG_TIDY_DEPS ?= 1
 _RULES_MK_FLAG_ENABLE_CGO ?= 1
 _RULES_MK_FLAG_ENABLE_GOGEN ?= 1
 _RULES_MK_FLAG_ENABLE_RACE ?= 1
@@ -128,8 +128,8 @@ endif
 # of CGO, in order to make sure that all object files (.a) are compiled
 # with the desired settings.
 #
-ifneq ($(_RULES_MK_FORCE_DEP_REBUILD),1)
-	_RULES_MK_FORCE_DEP_REBUILD := 0
+ifneq ($(_RULES_MK_FLAG_FORCE_DEP_REBUILD),1)
+	_RULES_MK_FLAG_FORCE_DEP_REBUILD := 0
 endif
 
 #
@@ -434,7 +434,7 @@ endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
 	@echo -e "Creating $(green)DEB$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(_RULES_MK_VARS_VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
-	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager deb --target dist/$(PLATFORM)/
+	@NAME=$(_RULES_MK_VARS_NAME) VERSION=$(_RULES_MK_VARS_VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager deb --target dist/$(PLATFORM)/
 	@rm -f .piped
 # @echo -e "PLATFORM: $(PLATFORM)"
 # @echo -e "GOOS: $(GOOS)"
@@ -455,7 +455,7 @@ endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
 	@echo -e "Creating $(green)RPM$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(_RULES_MK_VARS_VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
-	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager rpm --target dist/$(PLATFORM)/
+	@NAME=$(_RULES_MK_VARS_NAME) VERSION=$(_RULES_MK_VARS_VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager rpm --target dist/$(PLATFORM)/
 	@rm -f .piped
 
 .PHONY: apk
@@ -471,7 +471,7 @@ endif
 	$(eval GOOS=$(shell echo $(PLATFORM) | cut -d '/' -f 1))
 	$(eval GOARCH=$(shell echo $(PLATFORM) | cut -d '/' -f 2))
 	@echo -e "Creating $(green)APK$(reset) package for $(green)$(_RULES_MK_VARS_NAME)$(reset) version $(green)$(_RULES_MK_VARS_VERSION)$(reset) (for platform $(green)$(PLATFORM)$(reset))..."
-	@_RULES_MK_VARS_NAME=$(_RULES_MK_VARS_NAME) VERSION=$(VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager apk --target dist/$(PLATFORM)/
+	@NAME=$(_RULES_MK_VARS_NAME) VERSION=$(_RULES_MK_VARS_VERSION) GOOS=$(GOOS) GOARCH=$(GOARCH) PLATFORM=$(PLATFORM) nfpm package --packager apk --target dist/$(PLATFORM)/
 	@rm -f .piped
 
 .PHONY: container
