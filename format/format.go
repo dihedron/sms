@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/fatih/color"
@@ -73,7 +74,7 @@ func WriteToFileAsJSON(dir string, pattern string, content string) (string, erro
 			return file.Name(), err
 		}
 	} else {
-		if file, err = os.Create(pattern); err != nil {
+		if file, err = os.Create(filepath.Clean(pattern)); err != nil {
 			slog.Error("error opening output file", "path", file.Name(), "error", err)
 			return file.Name(), err
 		}

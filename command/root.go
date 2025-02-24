@@ -15,11 +15,11 @@ type Commands struct {
 
 	// Account is a subcommand group related to account management.
 	//lint:ignore SA5008 commands can have multiple aliases
-	Account account.Account `command:"account" alias:"a" description:"Account-related operations."`
+	Account account.Account `command:"account" alias:"acc" alias:"a" description:"Account-related operations."`
 
 	// Token is a subcommand group related to token management.
 	//lint:ignore SA5008 commands can have multiple aliases
-	Token token.Token `command:"token" alias:"t" description:"Token management operations."`
+	Token token.Token `command:"token" alias:"tok" alias:"tk" alias:"t" description:"Token management operations."`
 
 	// Version prints the application version information and exits.
 	//lint:ignore SA5008 commands can have multiple aliases
