@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/dihedron/sms/command/base"
-	"github.com/dihedron/sms/version"
+	"github.com/dihedron/sms/metadata"
 )
 
 // Version is the command that prints information about the application
@@ -20,9 +20,9 @@ type Version struct {
 func (cmd *Version) Execute(args []string) error {
 	slog.Debug("running version command")
 	if cmd.Verbose {
-		version.PrintFull(os.Stdout)
+		metadata.PrintFull(os.Stdout)
 	} else {
-		version.Print(os.Stdout)
+		metadata.Print(os.Stdout)
 	}
 	slog.Debug("command done")
 	return nil

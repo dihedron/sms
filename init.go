@@ -9,13 +9,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dihedron/sms/version"
+	"github.com/dihedron/sms/metadata"
 	"github.com/joho/godotenv"
 )
 
 func init() {
-	slog.Debug("checking .env environment variable", "name", version.DotEnvVarName)
-	if dotenv, ok := os.LookupEnv(version.DotEnvVarName); ok {
+	slog.Debug("checking .env environment variable", "name", metadata.DotEnvVarName)
+	if dotenv, ok := os.LookupEnv(metadata.DotEnvVarName); ok {
 		if err := godotenv.Load(dotenv); err != nil {
 			slog.Error("error loading .env file", "error", err)
 		}

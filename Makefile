@@ -1,4 +1,4 @@
-_RULES_MK_MINIMUM_VERSION=202502220945
+_RULES_MK_MINIMUM_VERSION=202502241730
 
 _RULES_MK_VARS_NAME := sms
 _RULES_MK_VARS_DESCRIPTION := Send SMS through RDCom API
@@ -13,7 +13,7 @@ _RULES_MK_VARS_MAINTAINER=dihedron.dev@gmail.com
 _RULES_MK_VARS_VENDOR=dihedron.dev@gmail.com
 _RULES_MK_VARS_PRODUCER_URL=https://github.com/dihedron/
 _RULES_MK_VARS_DOWNLOAD_URL=$(_RULES_MK_VARS_PRODUCER_URL)sms
-_RULES_MK_VARS_METADATA_PACKAGE=$$(grep "module .*" go.mod | sed 's/module //gi')/version
+_RULES_MK_VARS_METADATA_PACKAGE=$$(grep "module .*" go.mod | sed 's/module //gi')/metadata
 #_RULES_MK_VARS_DOTENV_VAR_NAME=
 
 

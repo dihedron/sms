@@ -1,4 +1,4 @@
-package version
+package metadata
 
 import (
 	"fmt"
@@ -11,12 +11,12 @@ import (
 
 // NOTE: these variables are populated at compile time by using the -ldflags
 // linker flag:
-//   $> go build -ldflags "-X github.com/dihedron/sms/version.GitHash=$(hash)"
+//   $> go build -ldflags "-X github.com/dihedron/sms/v.GitHash=$(hash)"
 // in order to get the package path to the GitHash variable to use in the
 // linker flag, use the nm utility and look for the variable in the built
 // application symbols, then use its path in the linker flag:
 //   $> nm ./dist/linux/amd64/sms | grep GitHash
-//   00000000015db9c0 b github.com/dihedron/sms/version.GitHash
+//   00000000015db9c0 b github.com/dihedron/sms/metadata.GitHash
 
 var (
 	// Name is the name of the application or plugin.
