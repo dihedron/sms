@@ -5,8 +5,10 @@ go 1.24.0
 require (
 	github.com/fatih/color v1.18.0
 	github.com/go-playground/validator/v10 v10.25.0
+	github.com/goccy/go-json v0.10.5
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/joho/godotenv v1.5.1
+	gopkg.in/yaml.v3 v3.0.1
 	resty.dev/v3 v3.0.0-beta.1
 )
 

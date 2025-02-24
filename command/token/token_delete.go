@@ -16,7 +16,7 @@ type Delete struct {
 
 // Execute is the real implementation of the token delete command.
 func (cmd *Delete) Execute(args []string) error {
-	slog.Debug("called token create command", "args", args)
+	slog.Debug("called token delete command", "args", args)
 
 	if len(args) == 0 {
 		slog.Error("no token ID provided")
@@ -45,16 +45,20 @@ func (cmd *Delete) Execute(args []string) error {
 	// 	options = append(options, rdcom.WithUserCredentials(cmd.Username, cmd.Password))
 	// }
 
-	client := rdcom.New(options...)
+	client, err := rdcom.New(options...)
+	if err != nil {
+		slog.Error("error initialising API client", "error", err)
+		return err
+	}
 
 	defer client.Close()
 
 	for _, arg := range args {
+
 		token, err := client.TokenService.Delete(arg)
 		if err != nil {
-			slog.Error("error performing token create API call", "error", err)
-			fmt.Printf("error: %s\n", color.RedString(err.Error()))
-			return fmt.Errorf("error performing API call: %w", err)
+			slog.Error("error performing token delete API call", "error", err)
+			return err
 		}
 
 		expiry := token.ExpiryDate

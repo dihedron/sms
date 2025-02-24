@@ -36,7 +36,11 @@ func (cmd *Ping) Execute(args []string) error {
 		options = append(options, rdcom.WithAuthToken(*cmd.Token))
 	}
 
-	client := rdcom.New(options...)
+	client, err := rdcom.New(options...)
+	if err != nil {
+		slog.Error("error initialising API client", "error", err)
+		return err
+	}
 
 	defer client.Close()
 

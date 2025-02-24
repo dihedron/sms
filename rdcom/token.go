@@ -59,25 +59,23 @@ func (t *TokenService) Create() (*Token, error) {
 }
 
 // Delete deletes one or more tokens.
-func (t *TokenService) Delete(token string) (*Token, error) {
+func (t *TokenService) Delete(id string) (*Token, error) {
+	if id == "" {
+		slog.Error("invalid token ID")
+		return nil, errors.New("invalid token ID")
+	}
 
 	if t.client.token == "" {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
-
-	response, err := doDelete[Token](t.client, &DeleteRequest[Token]{
-		Request: Request{
-			Path: "/api/v2/tokens/",
-		},
-		Value: Token{
-			Token: token,
-		},
+	token, err := Delete[Token](t.client, &Token{Token: id}, &DeleteOptions{
+		EntityPath: "/api/v2/tokens/",
 	})
 	if err != nil {
 		slog.Error("error placing API call", "error", err)
 		return nil, err
 	}
 	slog.Debug("API call success")
-	return response, nil
+	return token, nil
 }
