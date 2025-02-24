@@ -11,7 +11,7 @@ import (
 
 // NOTE: these variables are populated at compile time by using the -ldflags
 // linker flag:
-//   $> go build -ldflags "-X github.com/dihedron/sms/v.GitHash=$(hash)"
+//   $> go build -ldflags "-X github.com/dihedron/sms/metadata.GitHash=$(hash)"
 // in order to get the package path to the GitHash variable to use in the
 // linker flag, use the nm utility and look for the variable in the built
 // application symbols, then use its path in the linker flag:
