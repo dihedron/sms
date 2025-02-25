@@ -24,14 +24,14 @@ func (t *TokenService) List() ([]Token, error) {
 		return nil, errors.New("invalid token")
 	}
 
-	options := &ListOptions{
+	options := &PaginatedListOptions{
 		Options: Options{
 			EntityPath: "/api/v2/tokens",
 		},
 		PageSize: pointer.To(100),
 	}
 
-	result, err := List[Token](t.client, options)
+	result, err := PaginatedList[Token](t.client, options)
 
 	if err != nil {
 		slog.Error("error placing API call", "error", err)

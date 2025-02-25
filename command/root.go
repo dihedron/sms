@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/dihedron/sms/command/account"
 	"github.com/dihedron/sms/command/ping"
+	smsgateway "github.com/dihedron/sms/command/sms_gateway"
 	"github.com/dihedron/sms/command/token"
 	"github.com/dihedron/sms/command/version"
 )
@@ -16,6 +17,10 @@ type Commands struct {
 	// Account is a subcommand group related to account management.
 	//lint:ignore SA5008 commands can have multiple aliases
 	Account account.Account `command:"account" alias:"acc" alias:"a" description:"Account-related operations."`
+
+	// SMSGateway is a subcommand group related to SMS gateway management.
+	//lint:ignore SA5008 commands can have multiple aliases
+	SMSGateway smsgateway.SMSGateway `command:"sms_gateway" alias:"smsgw" alias:"gw" alias:"g" description:"SMS gateway-related operations."`
 
 	// Token is a subcommand group related to token management.
 	//lint:ignore SA5008 commands can have multiple aliases

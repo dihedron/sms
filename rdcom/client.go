@@ -38,6 +38,8 @@ type Client struct {
 	TokenService *TokenService `validate:"required"`
 	// AccountService is the Account service.
 	AccountService *AccountService `validate:"required"`
+	// SMSGatewayService is the Account service.
+	SMSGatewayService *SMSGatewayService `validate:"required"`
 }
 
 // Service represents an API service.
@@ -131,6 +133,7 @@ func New(options ...Option) (*Client, error) {
 	}
 	c.TokenService = &TokenService{Service{client: c}}
 	c.AccountService = &AccountService{Service{client: c}}
+	c.SMSGatewayService = &SMSGatewayService{Service{client: c}}
 	// TODO: initialise more services here...
 
 	// perform struct level validation
@@ -189,13 +192,44 @@ func Get[T any](client *Client, options *GetOptions) (*T, error) {
 	return result, nil
 }
 
-type ListOptions struct {
+type ListOptions Options
+
+func List[T any](client *Client, options *ListOptions) ([]T, error) {
+	request := client.api.R()
+
+	if options.QueryParams != nil {
+		slog.Debug("setting query params", "values", options.QueryParams)
+		request.SetQueryParams(options.QueryParams)
+	}
+
+	if options.PathParams != nil {
+		slog.Debug("setting path params", "values", options.PathParams)
+		request.SetPathParams(options.PathParams)
+	}
+
+	result := new([]T)
+	request.SetResult(result)
+	response, err := request.Get(options.EntityPath)
+	if err != nil {
+		slog.Error("error performing GET API request", "entity", options.EntityPath, "error", err)
+		return nil, err
+	}
+	if response.IsError() {
+		slog.Error("request failed", "error", response.Error())
+		return nil, fmt.Errorf("HTTP error: %d (%s)", response.StatusCode(), response.Status())
+	}
+
+	slog.Debug("GET API options successful", "path", options.EntityPath)
+	return *result, nil
+}
+
+type PaginatedListOptions struct {
 	Options  `json:",inline"`
 	PageSize *int `json:"page_size,omitempty" yaml:"page_size,omitempty"`
 }
 
-// List performs an API request to retrieve multiple entities, possibly using pagination.
-func List[T any](client *Client, options *ListOptions) ([]T, error) {
+// PaginatedList performs an API request to retrieve multiple entities, possibly using pagination.
+func PaginatedList[T any](client *Client, options *PaginatedListOptions) ([]T, error) {
 	request := client.api.R()
 
 	if options.QueryParams != nil {

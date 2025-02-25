@@ -97,21 +97,21 @@ type Account struct {
 	} `json:"limits"`
 }
 
-// List returns the list of tokens.
+// List returns the list of accounts.
 func (a *AccountService) List() ([]Account, error) {
 	if a.client.token == "" {
 		slog.Error("invalid token")
 		return nil, errors.New("invalid token")
 	}
 
-	options := &ListOptions{
+	options := &PaginatedListOptions{
 		Options: Options{
 			EntityPath: "/api/v2/accounts",
 		},
 		PageSize: pointer.To(100),
 	}
 
-	result, err := List[Account](a.client, options)
+	result, err := PaginatedList[Account](a.client, options)
 
 	if err != nil {
 		slog.Error("error placing API call", "error", err)
