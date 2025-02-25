@@ -81,3 +81,5 @@ func (c *Closer) Close() {
 		c.file.Close()
 	}
 }
+
+const DefaultDateFormat = "Monday, Jan 02, 2006 at 15:04:05 MST"

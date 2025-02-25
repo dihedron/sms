@@ -34,13 +34,15 @@ type Client struct {
 	token string
 	// account is the ID of the account to use ito scope requests.
 	account string `validate:"required"`
-	// TokenService is the Token service
-	TokenService *TokenService
+	// TokenService is the Token service.
+	TokenService *TokenService `validate:"required"`
+	// AccountService is the Account service.
+	AccountService *AccountService `validate:"required"`
 }
 
 // Service represents an API service.
 type Service struct {
-	client *Client
+	client *Client `validate:"required"`
 }
 
 // option allows to set options in a functional way.
@@ -119,7 +121,7 @@ func WithAuthToken(token string) Option {
 }
 
 // New creates anew API client.
-func New(options ...Option) *Client {
+func New(options ...Option) (*Client, error) {
 
 	c := &Client{
 		api: resty.New(),
@@ -128,6 +130,7 @@ func New(options ...Option) *Client {
 		option(c)
 	}
 	c.TokenService = &TokenService{Service{client: c}}
+	c.AccountService = &AccountService{Service{client: c}}
 	// TODO: initialise more services here...
 
 	// perform struct level validation
@@ -135,10 +138,10 @@ func New(options ...Option) *Client {
 	validate.RegisterStructValidation(check, Client{})
 	if err := validate.Struct(c); err != nil {
 		slog.Error("invalid API client configuration", "error", err)
-		return nil
+		return nil, err
 	}
 	slog.Debug("API client ready")
-	return c
+	return c, nil
 }
 
 // Close frees the API client resources.
@@ -158,7 +161,6 @@ type GetOptions Options
 
 // Get performs an API request to retrieve one single entity.
 func Get[T any](client *Client, options *GetOptions) (*T, error) {
-	var err error
 	request := client.api.R()
 
 	if options.QueryParams != nil {
@@ -171,39 +173,16 @@ func Get[T any](client *Client, options *GetOptions) (*T, error) {
 		request.SetPathParams(options.PathParams)
 	}
 
-	// if options.Input != nil {
-	// 	slog.Debug("setting input struct", "type", fmt.Sprintf("%T", options.Output))
-	// 	request.SetBody(options.Input)
-	// } else {
-	// 	slog.Debug("no input struct provided")
-	// }
-
-	// if options.Output != nil {
-	// 	slog.Debug("setting output struct", "type", fmt.Sprintf("%T", options.Output))
-	// 	request.SetResult(options.Output)
-	// } else {
-	// 	slog.Warn("no output struct provided")
-	// }
-
 	result := new(T)
 	request.SetResult(result)
-	_, err = request.Get(options.EntityPath)
-
-	// switch options.Method {
-	// case http.MethodGet:
-	// 	_, err = request.Get(call.Path)
-	// case http.MethodPost:
-	// 	_, err = request.Post(call.Path)
-	// case http.MethodDelete:
-	// 	_, err = request.Delete(call.Path)
-	// default:
-	// 	slog.Error("unsupported method", "method", call.Method)
-	// 	return nil, fmt.Errorf("unsupported method: %s", call.Method)
-	// }
-
+	response, err := request.Get(options.EntityPath)
 	if err != nil {
 		slog.Error("error performing GET API request", "entity", options.EntityPath, "error", err)
 		return nil, err
+	}
+	if response.IsError() {
+		slog.Error("request failed", "error", response.Error())
+		return nil, fmt.Errorf("HTTP error: %d (%s)", response.StatusCode(), response.Status())
 	}
 
 	slog.Debug("GET API options successful", "path", options.EntityPath)
@@ -253,13 +232,17 @@ func List[T any](client *Client, options *ListOptions) ([]T, error) {
 			request.SetQueryParam("offset", fmt.Sprintf("%d", offset))
 			offset = offset + 1
 		}
-		_, err := request.
+		response, err := request.
 			SetResult(page).
 			Get(options.EntityPath)
 
 		if err != nil {
 			slog.Error("error performing GET (many) API request", "error", err)
 			return nil, err
+		}
+		if response.IsError() {
+			slog.Error("request failed", "error", response.Error())
+			return nil, fmt.Errorf("HTTP error: %d (%s)", response.StatusCode(), response.Status())
 		}
 		slog.Debug("API call successful", "count", len(page.Results))
 		results = append(results, page.Results...)
@@ -286,14 +269,48 @@ func Create[T any](client *Client, entity *T, options *CreateOptions) (*T, error
 	}
 
 	result := new(T)
-	_, err := request.
+	response, err := request.
 		SetResult(result).
 		Post(options.EntityPath)
-
 	if err != nil {
 		slog.Error("error performing POST API request", "error", err)
 		return nil, err
 	}
+	if response.IsError() {
+		slog.Error("request failed", "error", response.Error())
+		return nil, fmt.Errorf("HTTP error: %d (%s)", response.StatusCode(), response.Status())
+	}
+
+	slog.Debug("API call success", "result", result)
+	return result, nil
+}
+
+type DeleteOptions Options
+
+// Delete performs an API request to delete an existing entity.
+func Delete[T any](client *Client, entity *T, options *DeleteOptions) (*T, error) {
+	request := client.api.R()
+
+	if entity != nil {
+		slog.Debug("setting entity", "type", fmt.Sprintf("%T", entity), "value", *entity)
+		request.SetBody(entity)
+	} else {
+		slog.Warn("no entity provided?")
+	}
+
+	result := new(T)
+	response, err := request.
+		SetResult(result).
+		Delete(options.EntityPath)
+	if err != nil {
+		slog.Error("error performing DELETE API request", "error", err)
+		return nil, err
+	}
+	if response.IsError() {
+		slog.Error("request failed", "error", response.Error())
+		return nil, fmt.Errorf("HTTP error: %d (%s)", response.StatusCode(), response.Status())
+	}
+
 	slog.Debug("API call success", "result", result)
 	return result, nil
 }

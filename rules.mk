@@ -2,7 +2,7 @@
 # This value is updated each time a new feature is added
 # to the rules.mk targets and build rules file.
 #
-_RULES_MK_CURRENT_VERSION := 202502221935
+_RULES_MK_CURRENT_VERSION := 202502241730
 ifeq ($(_RULES_MK_MINIMUM_VERSION),)
 	_RULES_MK_MINIMUM_VERSION := 0
 endif
@@ -30,7 +30,7 @@ _RULES_MK_VARS_MAINTAINER ?= <your-email>@gmail.com
 _RULES_MK_VARS_VENDOR ?= <your-email>@gmail.com
 _RULES_MK_VARS_PRODUCER_URL ?= https://github.com/<your-github-username>/
 _RULES_MK_VARS_DOWNLOAD_URL ?= $(_RULES_MK_VARS_PRODUCER_URL)$(_RULES_MK_VARS_NAME)
-_RULES_MK_VARS_METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/version
+_RULES_MK_VARS_METADATA_PACKAGE ?= $$(grep "module .*" go.mod | sed 's/module //gi')/metadata
 _RULES_MK_VARS_DOTENV_VAR_NAME ?= $$(echo $(_RULES_MK_VARS_NAME) | tr '[:lower:]' '[:upper:]' | tr '-' '_')_DOTENV
 
 #
