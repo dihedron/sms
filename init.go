@@ -13,13 +13,10 @@ import (
 )
 
 func init() {
-	slog.Debug("checking .env environment variable", "name", version.DotEnvVarName)
-	if dotenv, ok := os.LookupEnv(version.DotEnvVarName); ok {
-		if err := godotenv.Load(dotenv); err != nil {
-			slog.Error("error loading .env file", "error", err)
-		}
-	}
 
+	//
+	// initialize logger
+	//
 	const LevelNone = slog.Level(1000)
 
 	options := &slog.HandlerOptions{
@@ -88,4 +85,16 @@ func init() {
 
 	handler := slog.NewTextHandler(writer, options)
 	slog.SetDefault(slog.New(handler))
+
+	//
+	// load environment variables
+	//
+	slog.Debug("checking .env environment variable", "name", version.DotEnvVarName)
+	if dotenv, ok := os.LookupEnv(version.DotEnvVarName); ok {
+		slog.Debug("loading .env file...", "file", dotenv)
+		if err := godotenv.Load(dotenv); err != nil {
+			slog.Error("error loading .env file", "error", err)
+		}
+		slog.Debug("loaded .env file", "file", dotenv)
+	}
 }
