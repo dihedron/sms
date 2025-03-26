@@ -9,7 +9,7 @@ type SMSGateway struct {
 	// //lint:ignore SA5008 commands can have multiple aliases
 	// Delete Delete `command:"delete" alias:"del" alias:"d" description:"Delete a token."`
 
-	// List is the command to list accounts.
+	// List is the command to list SMS gateways.
 	//lint:ignore SA5008 commands can have multiple aliases
 	List List `command:"list" alias:"ls" alias:"l" description:"List existing accounts."`
 }
